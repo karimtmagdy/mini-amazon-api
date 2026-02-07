@@ -7,6 +7,7 @@ export const corsOption = () => {
     origin: (origin, callback) => {
       const { clientUrl, frontendUrl, globalUrl } = env;
       const allowedOrigins = [clientUrl, frontendUrl, globalUrl];
+      console.log(clientUrl);
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
@@ -22,7 +23,7 @@ export const corsOption = () => {
       // "Accept",
       // "Access-Control-Allow-Methods",
       // "Access-Control-Allow-Headers",
-      // "Access-Control-Allow-Credentials",
+      "Access-Control-Allow-Credentials",
     ],
     credentials: true,
     preflightContinue: false,

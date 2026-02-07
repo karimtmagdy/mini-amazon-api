@@ -4,10 +4,8 @@ import { setupRoutes } from "./routes";
 import { configApp } from "./config/config-app";
 const app = express();
 
-// Built-in JSON body parser
-// app.use(express.json());
+app.use(express.json());
 
-// Simple health route
 configApp(app);
 setupRoutes(app);
 app.get(["/", "/health"], (_req: Request, res: Response) => {
