@@ -5,6 +5,7 @@ import "dotenv/config";
 import { setupRoutes } from "./routes";
 const app = express();
 
+
 // Built-in JSON body parser
 app.use(express.json());
 
