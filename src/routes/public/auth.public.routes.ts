@@ -14,7 +14,7 @@ router.post(
   authenticated,
   authController.logoutOtherDevices,
 );
-
+router.post("/refresh-token", authController.refresh);
 export default {
   path: "/auth",
   router,

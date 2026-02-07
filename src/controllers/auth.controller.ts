@@ -44,5 +44,14 @@ export class AuthController {
       message: "Logged out from other devices successfully",
     });
   });
+  refresh = catchError(async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken;
+    const { accessToken } = await this.authService.refresh(refreshToken);
+    res.status(200).json({
+      status: "success",
+      message: "Token refreshed successfully",
+      data: { token: accessToken },
+    } satisfies GlobalResponse<{ token: string }>);
+  });
 }
 export const authController = new AuthController(authService);

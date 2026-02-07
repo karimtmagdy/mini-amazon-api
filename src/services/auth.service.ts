@@ -144,7 +144,6 @@ export class AuthService {
 
     await user.updateOne(update);
   }
-
   private async handleSuccessfulLogin(user: UserDto & Document) {
     // Only automatically reactivate if the status is 'inactive' or 'deactivated' (by self)
     // Locked accounts also need to be reset if they passed the timed check above
@@ -177,6 +176,7 @@ export class AuthService {
       },
     });
   }
+  
   async logout(refreshToken: string) {
     const session = await this.sessionRepo.findByToken(refreshToken);
     if (!session) return;
@@ -193,6 +193,23 @@ export class AuthService {
     // if (!user) throw new ApiError("User not found", 404);
     await this.sessionRepo.deleteOtherSessions(userId, currentToken);
     await user?.updateOne({ $unset: { logoutAt: new Date() } });
+  }
+  async refresh(refreshToken: string) {
+    const payload = jwtUitl.verifyRefreshToken(refreshToken);
+    const session = await this.sessionRepo.findByToken(refreshToken);
+    if (!session) throw new ApiError("Invalid or expired refresh token", 401);
+    const user = await this.userRepo.findById(payload.id);
+    if (!user || user.status !== "active") {
+      throw new ApiError("User not found or inactive", 401);
+    }
+    const newTokenPayload: TokenPayload = {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role,
+    };
+    const accessToken = jwtUitl.generateAccessToken(newTokenPayload);
+    return { accessToken };
   }
 }
 export const authService = new AuthService(
