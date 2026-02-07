@@ -47,7 +47,10 @@ export const loginUserSchema = z.object({
       .max(30, { message: "Password must be at most 30 characters" }),
   }),
 }) satisfies z.ZodType<{
-  body: Pick<UserDto, "email" | "password">;
+  body: {
+    email: string;
+    password: string;
+  };
 }>;
 
 export type RegisterUser = z.infer<typeof registerUserSchema>["body"];
