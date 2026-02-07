@@ -14,7 +14,7 @@ export const DEFAULT_USER_IMAGE =
 
 export interface GlobalResponse<T> {
   status: string;
-  message: string;
+  message?: string;
   data: T;
 }
 export type Route = {

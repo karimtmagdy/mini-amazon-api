@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "dist",
-    "rootDir": ".",
+    "rootDir": "./src",
 
     // Module system - Choose based on your setup
     "module": "commonjs", // For traditional Node/Vercel

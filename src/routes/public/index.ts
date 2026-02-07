@@ -1,4 +1,5 @@
-import authRoutes from "./auth.routes";
+import authRoutes from "./auth.public.routes";
+import userRoutes from "./user.public.routes";
 import type { Route } from "../../contract/global.dto";
 
-export default [authRoutes] as Route[];
+export default [authRoutes, userRoutes] as Route[];
