@@ -3,9 +3,10 @@ import "dotenv/config";
 import { Database } from "./config/data/db";
 
 import { setupRoutes } from "./routes";
+import { configApp } from "./config/config-app";
 
 const app = express();
-
+configApp(app);
 // Initialize Database with error handling
 const initDb = async () => {
   try {
@@ -18,6 +19,7 @@ const initDb = async () => {
 
 initDb();
 
+setupRoutes(app);
 app.get(["/", "/health"], (_req, res) => {
   res.status(200).json({
     code: 200,
@@ -30,6 +32,5 @@ app.get(["/", "/health"], (_req, res) => {
     environment: "production",
   });
 });
-setupRoutes(app);
 
 export default app;

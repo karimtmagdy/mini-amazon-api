@@ -1,5 +1,5 @@
-import type { UserDto } from "../contract/user.dto";
 import * as z from "zod";
+import type { UserDto } from "../contract/user.dto";
 
 export const emailRegex: RegExp =
   /^[a-zA-Z0-9._%+-]+@(gmail|yahoo|outlook|hotmail)\.(com|net|org)$/;

@@ -1,12 +1,13 @@
 import mongoose from "mongoose";
 // import '../../scripts/sync-env-vercel'
+import { env } from "../../lib/env";
 export class Database {
   static instance: Database;
   private constructor() {}
   public static async getInstance(): Promise<Database> {
-    const { DB_URI, DB_PASS, DB_LOCAL, MONGO_URL_MONGODB_URI } = process.env;
-    const url = DB_URI?.replace("<PASSWORD>", String(DB_PASS));
-    const uri = url || DB_LOCAL || MONGO_URL_MONGODB_URI;
+    const { dbUri, dbPass, dbLocal, mongoDbUri } = env;
+    const url = dbUri?.replace("<PASSWORD>", String(dbPass));
+    const uri = url || dbLocal || mongoDbUri;
     if (!uri) {
       throw new Error("Please provide a MongoDB URI");
     }

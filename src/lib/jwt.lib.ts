@@ -1,16 +1,14 @@
 import jwt, { type Secret, type SignOptions } from "jsonwebtoken";
 import type { StringValue } from "ms";
 import type { IdPayload, TokenPayload } from "../contract/sessions.dto";
-
+import { env } from "../lib/env";
 // export interface CartPayload {
 //   cartId: string;
 // }
-
 // export interface ResetPayload extends JWTPayload {
 //   email: string;
 // }
-const { ACCESS_TOKEN, ACCESS_EXPIRES_IN, REFRESH_TOKEN, REFRESH_EXPIRES_IN } =
-  process.env;
+const { accessToken, accessExpiresIn, refreshToken, refreshExpiresIn } = env;
 class JWT {
   private sign(
     payload: TokenPayload | IdPayload,
@@ -26,22 +24,22 @@ class JWT {
   generateAccessToken(payload: TokenPayload): string {
     return this.sign(
       payload,
-      ACCESS_TOKEN as Secret,
-      ACCESS_EXPIRES_IN as StringValue,
+      accessToken as Secret,
+      accessExpiresIn as StringValue,
     );
   }
   verifyAccessToken(token: string): TokenPayload {
-    return this.verify<TokenPayload>(token, ACCESS_TOKEN as Secret);
+    return this.verify<TokenPayload>(token, accessToken as Secret);
   }
   generateRefreshToken(payload: IdPayload): string {
     return this.sign(
       payload,
-      REFRESH_TOKEN as Secret,
-      REFRESH_EXPIRES_IN as StringValue,
+      refreshToken as Secret,
+      refreshExpiresIn as StringValue,
     );
   }
   verifyRefreshToken(token: string): IdPayload {
-    return this.verify<IdPayload>(token, REFRESH_TOKEN as Secret);
+    return this.verify<IdPayload>(token, refreshToken as Secret);
   }
   //   generateCartToken(payload: CartPayload): string {
   //     return this.sign(

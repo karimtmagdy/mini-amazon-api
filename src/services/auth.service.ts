@@ -7,6 +7,7 @@ import type { DeviceInfo, TokenPayload } from "../contract/sessions.dto";
 import { jwtUitl } from "../lib/jwt.lib";
 import type { Document } from "mongoose";
 import type { UserDto } from "../contract/user.dto";
+import { env } from "../lib/env";
 export class AuthService {
   constructor(
     protected userRepo: UserRepo,
@@ -102,8 +103,7 @@ export class AuthService {
     const refreshToken = jwtUitl.generateRefreshToken(payload);
 
     // 5. Create Session
-    const expiresIn =
-      (process.env.REFRESH_EXPIRES_IN as ms.StringValue) || "7d";
+    const expiresIn = (env.refreshExpiresIn as ms.StringValue) || "7d";
     const expiresAt = new Date(Date.now() + ms(expiresIn));
 
     await this.sessionRepo.create({

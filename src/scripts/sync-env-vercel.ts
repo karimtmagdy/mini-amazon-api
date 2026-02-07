@@ -1,12 +1,12 @@
 import fs from "fs";
 import path from "path";
 import dotenv from "dotenv";
-
+import { env } from "../lib/env";
 dotenv.config();
 
-const { VERCEL_TOKEN, VERCEL_PROJECTID, VERCEL_TEAM_ID } = process.env;
+const { vercelToken, vercelProjectId, vercelTeamId, vercelApiUrl } = env;
 
-if (!VERCEL_TOKEN || !VERCEL_PROJECTID) {
+if (!vercelToken || !vercelProjectId) {
   throw new Error("Missing VERCEL_TOKEN or VERCEL_PROJECTID in .env");
 }
 
@@ -27,20 +27,20 @@ const envPath = path.resolve(process.cwd(), ".env");
 const envFile = fs.readFileSync(envPath, "utf-8");
 const localEnv = dotenv.parse(envFile);
 
-console.log("Local .env variables:", localEnv);
+// console.log("Local .env variables:", localEnv);
 
 // Sync environment variables to Vercel
 async function syncEnv() {
-  const projectId = VERCEL_PROJECTID;
+  // const projectId = vercelProjectId;
 
   // 1️⃣ Get remote envs
   let remoteEnv: any[] = [];
   try {
-    const url = new URL(`https://api.vercel.com/v9/projects/${projectId}/env`);
-    if (VERCEL_TEAM_ID) url.searchParams.append("teamId", VERCEL_TEAM_ID);
+    const url = new URL(`${vercelApiUrl}/${vercelProjectId}/env`);
+    if (vercelTeamId) url.searchParams.append("teamId", vercelTeamId);
 
     const data: any = await fetchJson(url.toString(), {
-      headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },
+      headers: { Authorization: `Bearer ${vercelToken}` },
     });
 
     remoteEnv = data.envs || [];
@@ -53,25 +53,25 @@ async function syncEnv() {
     // Delete existing
     const existing = remoteEnv.find((e) => e.key === key);
     if (existing) {
-      const delUrl = `https://api.vercel.com/v9/projects/${projectId}/env/${existing.id}${
-        VERCEL_TEAM_ID ? `?teamId=${VERCEL_TEAM_ID}` : ""
+      const delUrl = `${vercelApiUrl}/${vercelProjectId}/env/${existing.id}${
+        vercelTeamId ? `?teamId=${vercelTeamId}` : ""
       }`;
       await fetch(delUrl, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },
+        headers: { Authorization: `Bearer ${vercelToken}` },
       });
       console.log(`🗑️ Removed existing variable: ${key}`);
     }
 
     // Add new
-    const postUrl = `https://api.vercel.com/v9/projects/${projectId}/env${
-      VERCEL_TEAM_ID ? `?teamId=${VERCEL_TEAM_ID}` : ""
+    const postUrl = `${vercelApiUrl}/${vercelProjectId}/env${
+      vercelTeamId ? `?teamId=${vercelTeamId}` : ""
     }`;
 
     await fetch(postUrl, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${VERCEL_TOKEN}`,
+        Authorization: `Bearer ${vercelToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

@@ -12,6 +12,7 @@ export class ApiError extends Error {
     const statusCodeStr = String(this.statusCode);
     this.status = statusCodeStr.startsWith("4") ? "fail" : "error";
     // this.stack = stack;
+    // this.stack = stack;
     this.isOperational = true;
     Error.captureStackTrace(this, this.constructor);
   }
