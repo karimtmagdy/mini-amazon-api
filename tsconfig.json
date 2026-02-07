@@ -28,7 +28,7 @@
     "isolatedModules": true,
     // "noUncheckedSideEffectImports": true,
     // "moduleDetection": "force",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "skipLibCheck": true,
     //
     "esModuleInterop": true,
