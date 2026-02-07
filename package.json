@@ -11,8 +11,8 @@
   "private": true,
   "scripts": {
     "dev": "nodemon",
-    "build": "tsc",
-    "start": "node dist/index.js",
+    "build": "ncc build api/index.ts -o dist/api -m",
+    "start": "node dist/api/index.js",
     "kill": "kill-port 8000",
     "random": "node -e \"console.log(crypto.randomBytes(32).toString('hex'))\"",
     "lint": "eslint . --ext .ts",
@@ -78,6 +78,7 @@
     "@types/passport-local": "^1.0.38",
     "@types/sanitize-html": "^2.16.0",
     "@types/ua-parser-js": "^0.7.39",
+    "@vercel/ncc": "^0.38.4",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
