@@ -2,19 +2,19 @@
   "version": 2,
   "builds": [
     {
-      "src": "dist/api/index.js",
+      "src": "dist/index.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "dist/api/index.js"
+      "dest": "dist/index.js"
     }
   ],
   "crons": [
     {
-      "path": "/dist/api/index.js",
+      "path": "/dist/index.js",
       "schedule": "0 10 * * *"
     }
   ]
