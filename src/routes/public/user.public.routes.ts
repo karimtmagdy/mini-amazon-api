@@ -3,9 +3,9 @@ import { userController } from "../../controllers/user.controller";
 
 const router = Router();
 
-router.get("/me", userController.getUserHimself);
+router.route("/me").get(userController.getUserHimself);
 
 export default {
-  path: "/user",
+  path: "/users",
   router,
 };
