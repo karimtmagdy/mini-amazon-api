@@ -4,7 +4,7 @@ import { DEFAULT_USER_IMAGE } from "src/contract/global.dto";
 
 export class UserRepo {
   async findByEmail(email: string) {
-    return await User.findOne({ email });
+    return await User.findOne({ email }).select("+password");
   }
   async findByUsername(username: string) {
     return await User.findOne({ username });
@@ -12,9 +12,9 @@ export class UserRepo {
   async findById(id: string) {
     return await User.findById(id);
   }
-//   async findByRefreshToken(refreshToken: string) {
-//     return await Session.findOne({ refreshToken });
-//   }
+  //   async findByRefreshToken(refreshToken: string) {
+  //     return await Session.findOne({ refreshToken });
+  //   }
   async create(user: UserDto) {
     return await User.create(user);
   }
