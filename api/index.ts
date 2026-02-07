@@ -1,7 +1,9 @@
 import express from "express";
 import "dotenv/config";
+import { setupRoutes } from "../src/routes";
 
 const app = express();
+
 
 app.get(["/", "/health"], (_req, res) => {
   res.status(200).json({
@@ -15,5 +17,6 @@ app.get(["/", "/health"], (_req, res) => {
     environment: "production",
   });
 });
+setupRoutes(app);
 
 export default app;

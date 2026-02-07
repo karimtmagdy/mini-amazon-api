@@ -2,6 +2,7 @@ import express, { type Request, type Response } from "express";
 // import "@config/db";
 // import userRouter from "@routes/userRoutes";
 import "dotenv/config";
+import { setupRoutes } from "./routes";
 const app = express();
 
 // Built-in JSON body parser
@@ -13,6 +14,6 @@ app.get(["/", "/health"], (_req: Request, res: Response) => {
 });
 
 // User routes
-// app.use("/users", userRouter);
+setupRoutes(app);
 
 export default app;
