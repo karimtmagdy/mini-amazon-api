@@ -1,38 +1,38 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "rootDir": ".",
     "outDir": "dist",
-    "module": "esnext",
+    "rootDir": ".",
+    
+    // Module system - Choose based on your setup
+    "module": "commonjs",        // For traditional Node/Vercel
     "target": "ES2022",
     "lib": ["ES2022"],
-    // "types": ["node"],
-
+    "types": ["node"],           // ✅ Enable Node types
+    
+    // Build options
     "sourceMap": true,
     "declaration": false,
-
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "allowSyntheticDefaultImports": true,
-
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
-
-    "strict": true,
-    "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    // "noUncheckedSideEffectImports": true,
-    // "moduleDetection": "force",
-    "moduleResolution": "node",
-    "skipLibCheck": true,
-    //
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    
+    // Strict checks
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    
+    // Module resolution
+    "moduleResolution": "node",
+    "resolveJsonModule": true,   // ✅ For importing JSON
+    "allowSyntheticDefaultImports": true,
+    
+    // Isolated modules (required for some bundlers)
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false, // ⚠️ May conflict with CommonJS
+    
     "noEmitOnError": false
-  }
+  },
+  "include": ["api/**/*", "src/**/*"],  // ✅ Specify source folders
+  "exclude": ["node_modules", "dist"]
 }
