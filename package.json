@@ -1,41 +1,94 @@
 {
   "name": "mini-amazon-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Mini Express + Mongoose + Zod + TypeScript API for Vercel",
   "main": "dist/index.js",
   "type": "module",
+  "module": "commonjs",
+  "engines": {
+    "node": "24.x"
+  },
+  "private": true,
   "scripts": {
     "dev": "nodemon",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "kill": "kill-port 8000",
+    "random": "node -e \"console.log(crypto.randomBytes(32).toString('hex'))\"",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "deploy": "vercel build && vercel --prod --yes",
+    "vercel": "vercel dev"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "karimtmagdy",
+  "license": "Apache-2.0",
+  "keywords": [
+    "rest api",
+    "express",
+    "typescript",
+    "mongoose"
+  ],
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.9.0",
+    "color": "^5.0.3",
+    "colors.ts": "^1.0.20",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
     "dotenv": "^17.2.4",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.6",
     "morgan": "^1.10.1",
+    "multer": "^2.0.2",
+    "node-cache": "^5.1.2",
+    "node-cron": "^4.2.1",
     "node-fetch": "^3.3.2",
+    "nodemailer": "^8.0.0",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "resend": "^6.9.1",
+    "sanitize-html": "^2.17.0",
+    "sharp": "^0.34.5",
     "slugify": "^1.6.6",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
+    "stripe": "^20.3.1",
     "ua-parser-js": "^2.0.9",
+    "xss": "^1.0.15",
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@types/compression": "^1.8.1",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/hpp": "^0.2.7",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
+    "@types/multer": "^2.0.0",
     "@types/node": "^25.2.1",
+    "@types/node-cron": "^3.0.11",
+    "@types/nodemailer": "^7.0.9",
+    "@types/passport": "^1.0.17",
+    "@types/passport-local": "^1.0.38",
+    "@types/sanitize-html": "^2.16.0",
+    "@types/ua-parser-js": "^0.7.39",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
-    "tsc": "^2.0.4",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/karimtmagdy/mini-amazon-api.git"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/karimtmagdy/mini-amazon-api/issues"
+  },
+  "homepage": "https://github.com/karimtmagdy/mini-amazon-api#readme"
 }
