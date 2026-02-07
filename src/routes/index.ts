@@ -1,10 +1,7 @@
+import type { Route } from "src/contract/global.dto";
 import publicRoutes from "./public";
-import type { Express, Router } from "express";
+import type { Express } from "express";
 
-type Route = {
-  path: string;
-  router: Router;
-};
 const RV1 = "/api/v1";
 export const setupRoutes = (app: Express) => {
   publicRoutes.forEach((route: Route) => {

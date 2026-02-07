@@ -5,7 +5,7 @@ import type { UserDto } from "./user.dto";
 
 export type SessionDto = {
   refreshToken: string;
-  userId: string;
+  userId: string | ObjectId;
   deviceInfo: DeviceInfo;
   createdAt: Date;
   expiresAt: Date;

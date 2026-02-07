@@ -1,3 +1,5 @@
+import type { Router } from "express";
+
 export type At = {
   createdAt: Date;
   updatedAt: Date;
@@ -15,3 +17,7 @@ export interface GlobalResponse<T> {
   message: string;
   data: T;
 }
+export type Route = {
+  path: string;
+  router: Router;
+};

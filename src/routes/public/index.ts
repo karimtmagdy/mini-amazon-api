@@ -1,9 +1,4 @@
 import authRoutes from "./auth.routes";
-import type { Router } from "express";
-
-type Route = {
-  path: string;
-  router: Router;
-};
+import type { Route } from "src/contract/global.dto";
 
 export default [authRoutes] as Route[];
