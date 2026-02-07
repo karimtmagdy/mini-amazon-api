@@ -9,7 +9,7 @@
     // "types": ["node"],
 
     "sourceMap": true,
-    "declaration": true,
+    "declaration": false,
 
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
