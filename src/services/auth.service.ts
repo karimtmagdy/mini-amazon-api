@@ -42,8 +42,6 @@ export class AuthService {
     }
 
     // 3. Status checks
-    const userId = user.id;
-
     switch (user.status) {
       case "banned":
         throw new ApiError(
@@ -61,22 +59,22 @@ export class AuthService {
           throw new ApiError("Your account is currently locked.", 403);
         }
         break;
-        //   case "deactivated":
-        //     // If deactivated by someone else (Admin), block login
-        //     if (updaterId && updaterId !== userId) {
-        //       throw new ApiError(
-        //         "Your account has been deactivated by an administrator. Please contact support.",
-        //         403,
-        //       );
-        //     }
-        //     // If no updater record exists, block login for safety
-        //     if (!updaterId) {
-        //       throw new ApiError(
-        //         "Your account is deactivated. Please contact support for reactivation.",
-        //         403,
-        //       );
-        //     }
-        // break;
+      //   case "deactivated":
+      //     // If deactivated by someone else (Admin), block login
+      //     if (updaterId && updaterId !== userId) {
+      //       throw new ApiError(
+      //         "Your account has been deactivated by an administrator. Please contact support.",
+      //         403,
+      //       );
+      //     }
+      //     // If no updater record exists, block login for safety
+      //     if (!updaterId) {
+      //       throw new ApiError(
+      //         "Your account is deactivated. Please contact support for reactivation.",
+      //         403,
+      //       );
+      //     }
+      // break;
       case "active":
       case "inactive":
         // These are allowed
@@ -178,6 +176,23 @@ export class AuthService {
         logoutAt: "",
       },
     });
+  }
+  async logout(refreshToken: string) {
+    const session = await this.sessionRepo.findByToken(refreshToken);
+    if (!session) return;
+    const user = await this.userRepo.findById(session.userId.toString());
+    if (user) {
+      await user.updateOne({
+        $set: { state: "offline", logoutAt: new Date() },
+      });
+    }
+    await this.sessionRepo.deleteByToken(refreshToken);
+  }
+  async logoutOtherDevices(userId: string, currentToken: string) {
+    const user = await this.userRepo.findById(userId);
+    // if (!user) throw new ApiError("User not found", 404);
+    await this.sessionRepo.deleteOtherSessions(userId, currentToken);
+    await user?.updateOne({ $unset: { logoutAt: new Date() } });
   }
 }
 export const authService = new AuthService(

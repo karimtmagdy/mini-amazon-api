@@ -25,7 +25,7 @@ export class UserRepo {
     return await User.findByIdAndUpdate(
       id,
       {
-        status: "deleted",
+        status: "archived",
         deletedAt: new Date(),
         // refreshTokens: [],
         image: {

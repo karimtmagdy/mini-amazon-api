@@ -5,7 +5,7 @@ export class UserService {
   async getUserHimself(userId: string) {
     const user = await this.userRepo.findById(userId);
     if (!user) throw new ApiError("User not found", 404);
-    return user;
+    return { user };
   }
 }
 

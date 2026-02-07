@@ -6,8 +6,8 @@ import { UserDto } from "../contract/user.dto";
 export class UserController {
   constructor(protected userService: UserService) {}
   getUserHimself = catchError(async (req: Request, res: Response) => {
-    const id = req?.user?.id;
-    const user = await this.userService.getUserHimself(id);
+    const id = req.user.id;
+    const { user } = await this.userService.getUserHimself(id);
     return res.status(200).json({
       status: "success",
       data: user,
