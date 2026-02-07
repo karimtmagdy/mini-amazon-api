@@ -5,6 +5,8 @@ import ms from "ms";
 import { SessionRepository, sessionRepo } from "../repo/session.repo";
 import type { DeviceInfo, TokenPayload } from "src/contract/sessions.dto";
 import { jwtUitl } from "src/lib/jwt.lib";
+import type { Document } from "mongoose";
+import type { UserDto } from "src/contract/user.dto";
 export class AuthService {
   constructor(
     protected userRepo: UserRepo,
@@ -23,7 +25,7 @@ export class AuthService {
       user.lockedUntil > new Date()
     ) {
       const remainingTime = Math.ceil(
-        (user.lockedUntil.getTime() - Date.now()) / (1000 * 60),
+        (user.lockedUntil.getTime() - Date.now()) / (1000 * 60), // in minutes
       );
       throw new ApiError(
         `Account is locked. Please try again in ${remainingTime} minutes.`,
@@ -90,7 +92,7 @@ export class AuthService {
     await this.handleSuccessfulLogin(user);
 
     const payload = {
-      id: user._id.toString(),
+      id: user.id,
       email: user.email,
       username: user.username,
       role: user.role ?? "user",
@@ -105,7 +107,7 @@ export class AuthService {
     const expiresAt = new Date(Date.now() + ms(expiresIn));
 
     await this.sessionRepo.create({
-      userId: user._id.toString(),
+      userId: user.id,
       refreshToken,
       deviceInfo: reqDeviceInfo,
       expiresAt,
@@ -145,21 +147,20 @@ export class AuthService {
     await user.updateOne(update);
   }
 
-  private async handleSuccessfulLogin(user: any) {
+  private async handleSuccessfulLogin(user: UserDto & Document) {
     // Only automatically reactivate if the status is 'inactive' or 'deactivated' (by self)
     // Locked accounts also need to be reset if they passed the timed check above
     let newStatus = user.status;
     if (user.status === "inactive" || user.status === "locked") {
       newStatus = "active";
     } else if (user.status === "deactivated") {
-      const updaterId =
-        user.updatedBy?._id?.toString() || user.updatedBy?.toString();
-      const userId = user._id.toString();
-
+      //   const updaterId =
+      // user.updatedBy?._id?.toString() || user.updatedBy?.toString();
+      //   const userId = user._id.toString();
       // ONLY reactivate if specifically deactivated by self
-      if (updaterId === userId) {
-        newStatus = "active";
-      }
+      // if (updaterId === userId) {
+      //   newStatus = "active";
+      // }
       // If updaterId is null/undefined, we err on the side of caution and keep it deactivated
       // unless we want to allow auto-reactivation for legacy data.
       // For now, let's keep it locked if it wasn't obviously self-deactivated.

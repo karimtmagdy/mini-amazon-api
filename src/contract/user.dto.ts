@@ -32,6 +32,7 @@ export const USER_ROLES = [
 export type UserRole = (typeof USER_ROLES)[number];
 
 export type UserDto = At & {
+  id: string;
   // id: string | ObjectId;
   username: string;
   slug?: string;

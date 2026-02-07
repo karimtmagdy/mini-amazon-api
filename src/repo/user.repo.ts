@@ -38,7 +38,7 @@ export class UserRepo {
   }
   async deleteBulkUsers(ids: string[]) {
     return await User.updateMany(
-      { _id: { $in: ids } },
+      { id: { $in: ids } },
       { status: "inactive", deletedAt: new Date() },
     );
   }
