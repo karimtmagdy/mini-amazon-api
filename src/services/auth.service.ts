@@ -3,10 +3,10 @@ import { ApiError } from "../class/api.error";
 import { logger } from "../lib/logger";
 import ms from "ms";
 import { SessionRepository, sessionRepo } from "../repo/session.repo";
-import type { DeviceInfo, TokenPayload } from "src/contract/sessions.dto";
-import { jwtUitl } from "src/lib/jwt.lib";
+import type { DeviceInfo, TokenPayload } from "../contract/sessions.dto";
+import { jwtUitl } from "../lib/jwt.lib";
 import type { Document } from "mongoose";
-import type { UserDto } from "src/contract/user.dto";
+import type { UserDto } from "../contract/user.dto";
 export class AuthService {
   constructor(
     protected userRepo: UserRepo,

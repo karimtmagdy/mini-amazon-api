@@ -1,10 +1,10 @@
 import type { Request, Response } from "express";
 import { authService, type AuthService } from "../services/auth.service";
 import { catchError } from "../lib/catch.error";
-import type { LoginUser } from "src/schemas/auth.schema";
-import { CookieOptions } from "src/lib/cookie-options";
+import type { LoginUser } from "../schemas/auth.schema";
+import { CookieOptions } from "../lib/cookie-options";
 import { getUserAgent } from "../lib/user-agent";
-import type { GlobalResponse } from "src/contract/global.dto";
+import type { GlobalResponse } from "../contract/global.dto";
 
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

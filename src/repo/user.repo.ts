@@ -1,6 +1,6 @@
 import { User } from "../models/user.model";
 import type { UserDto } from "../contract/user.dto";
-import { DEFAULT_USER_IMAGE } from "src/contract/global.dto";
+import { DEFAULT_USER_IMAGE } from "../contract/global.dto";
 
 export class UserRepo {
   async findByEmail(email: string) {

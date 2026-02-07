@@ -1,4 +1,4 @@
-import type { UserDto } from "src/contract/user.dto";
+import type { UserDto } from "../contract/user.dto";
 import * as z from "zod";
 
 export const emailRegex: RegExp =

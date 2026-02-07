@@ -1,4 +1,3 @@
-import type { ObjectId } from "mongoose";
 import type { At, Image } from "./global.dto";
 
 export const USER_STATE = ["online", "offline"] as const;
@@ -55,7 +54,7 @@ export type UserDto = At & {
   activeAt?: Date;
   logoutAt?: Date;
   lockedUntil?: Date;
-    failedLoginAttempts?: number;
+  failedLoginAttempts?: number;
   //   cart?: {
   //     type?: string;
   //     productId: any;
