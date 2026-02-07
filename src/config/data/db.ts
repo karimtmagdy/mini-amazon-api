@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-// import '../../scripts/sync-env-vercel'
+import '../../scripts/sync-env-vercel'
 export class Database {
   static instance: Database;
   private constructor() {}

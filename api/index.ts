@@ -6,7 +6,17 @@ import { setupRoutes } from "../src/routes";
 
 const app = express();
 
-Database.getInstance();
+// Initialize Database with error handling
+const initDb = async () => {
+  try {
+    await Database.getInstance();
+    console.log("✅ Database initialized successfully");
+  } catch (error) {
+    console.error("❌ Database initialization failed:", error);
+  }
+};
+
+initDb();
 
 app.get(["/", "/health"], (_req, res) => {
   res.status(200).json({

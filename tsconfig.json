@@ -3,8 +3,7 @@
     "baseUrl": ".",
     "rootDir": ".",
     "outDir": "dist",
-
-    "module": "es2022",
+    "module": "esnext",
     "target": "ES2022",
     "lib": ["ES2022"],
     // "types": ["node"],

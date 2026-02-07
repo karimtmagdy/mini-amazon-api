@@ -1,4 +1,4 @@
-import type { Route } from "src/contract/global.dto";
+import type { Route } from "../contract/global.dto";
 import publicRoutes from "./public";
 import type { Express } from "express";
 
