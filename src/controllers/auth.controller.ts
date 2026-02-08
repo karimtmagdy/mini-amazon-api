@@ -21,11 +21,10 @@ export class AuthController {
     res.status(200).json({
       status: "success",
       message: `welcome back ${user.username}`,
-      data: { token, user, deviceInfo },
+      data: { token, user },
     } satisfies GlobalResponse<{
       token: string;
       user: typeof user;
-      deviceInfo: typeof deviceInfo;
     }>);
   });
   logout = catchError(async (req: Request, res: Response) => {
