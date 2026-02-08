@@ -3,9 +3,14 @@ import type { DeviceInfo, SessionDto } from "../contract/sessions.dto";
 
 const deviceInfoSchema = new Schema<DeviceInfo>(
   {
-    browser: String,
-    os: String,
-    device: String,
+    browser: {
+      name: String,
+      version: String,
+    },
+    os: {
+      name: String,
+      version: String,
+    },
     engine: String,
     cpu: String,
     ip: String,

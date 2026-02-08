@@ -11,9 +11,14 @@ export type SessionDto = {
   expiresAt: Date;
 };
 export type DeviceInfo = {
-  browser: string;
-  os: string;
-  device: string;
+  browser: {
+    name: string;
+    version: string;
+  };
+  os: {
+    name: string;
+    version: string;
+  };
   engine: string;
   cpu: string;
   ip: string;

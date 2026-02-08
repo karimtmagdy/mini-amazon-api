@@ -33,8 +33,10 @@ export function configApp(app: Express) {
   // app.use(sanitizeHtml.defaults()) Prevent NoSQL injection
   app.use(hpp()); // Prevent HTTP Parameter Pollution
 
-  // 5. Logging (Development only)
+  // 5. Logging & Dev Tools (Development only)
   if (env.nodeEnv === "development") {
+    const { geoDev } = require("../middlewares/geo-dev");
+    app.use(geoDev);
     app.use(morgan("dev"));
     logger.log("🛠 Using local MongoDB for development");
   }
