@@ -2,6 +2,11 @@ import { User } from "../models/user.model";
 import type { UserDto } from "../contract/user.dto";
 import { DEFAULT_USER_IMAGE } from "../contract/global.dto";
 
+/**
+ * Design Pattern: Repository Pattern
+ * Purpose: Abstracts user data access and provides CRUD operations for User entities.
+ * Responsibilities: Database queries, user creation/updates, soft deletion, and bulk operations.
+ */
 export class UserRepo {
   async findByEmail(email: string) {
     return await User.findOne({ email }).select("+password");

@@ -8,6 +8,12 @@ import { jwtUitl } from "../lib/jwt.lib";
 import type { Document } from "mongoose";
 import type { UserDto } from "../contract/user.dto";
 import { env } from "../lib/env";
+
+/**
+ * Design Pattern: Service Layer + Strategy Pattern
+ * Purpose: Handles authentication business logic including login, logout, token refresh, and session management.
+ * Responsibilities: Password verification, account status checks, failed login handling, token generation/rotation.
+ */
 export class AuthService {
   constructor(
     protected userRepo: UserRepo,

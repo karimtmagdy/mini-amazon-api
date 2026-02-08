@@ -7,6 +7,11 @@ import { getUserAgent } from "../lib/user-agent";
 import type { GlobalResponse } from "../contract/global.dto";
 import { ApiError } from "../class/api.error";
 
+/**
+ * Design Pattern: MVC Controller
+ * Purpose: Handles authentication-related HTTP requests and manages cookie-based session tokens.
+ * Responsibilities: Login/logout flows, token refresh, multi-device session management, and HTTP response formatting.
+ */
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
   login = catchError(async (req: Request, res: Response) => {

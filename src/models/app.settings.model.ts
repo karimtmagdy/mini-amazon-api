@@ -1,68 +1,41 @@
 import { Schema, model } from "mongoose";
-// import { AppDto } from "@/types/app.dto";
+import type { AppSettingsDto } from "../contract/app-settings.dto";
 
-type AppSettingsDto = {
-  id: string;
-  general: {
-    title: string | null;
-    icon: string | null;
-    logo: string | null;
-    favicon: string | null;
-  };
-  system: {
-    maintenance: boolean | null;
-    maintenanceMessage: string | null;
-  };
-
-  seo: {
-    title: string | null;
-    description: string | null;
-    keywords: string | null;
-    author: string | null;
-    robots: string | null;
-    google_site_verification: string | null;
-    bing_site_verification: string | null;
-    yandex_site_verification: string | null;
-    alexa_site_verification: string | null;
-    pinterest_site_verification: string | null;
-  };
-  settings: {
-    currency: string | null;
-    language: string | null;
-    timezone: string | null;
-    date_format: string | null;
-    time_format: string | null;
-  };
-  policy: {
-    rules: string | null;
-    privacy: string | null;
-    terms: string | null;
-    refund: string | null;
-    shipping: string | null;
-    cancellation: string | null;
-  };
-};
-
+/**
+ * Design Pattern: Singleton Pattern (via unique constraint)
+ * Purpose: Ensures only one instance of application settings exists in the database.
+ * Implementation: Uses unique 'id' field with default value "app-settings" to enforce single document.
+ */
 const AppSettingsSchema = new Schema<AppSettingsDto>(
   {
-    id: { type: String, default: "app-settings" },
+    id: { type: String, default: "app-settings", unique: true },
     general: {
-      title: { type: String, default: null },
+      title: { type: String, default: "Mini Amazon" },
       icon: { type: String, default: null },
       logo: { type: String, default: null },
       favicon: { type: String, default: null },
     },
     system: {
       maintenance: { type: Boolean, default: false },
-      maintenanceMessage: { type: String, default: null },
+      maintenanceMessage: {
+        type: String,
+        default: "System is under maintenance. Please try again later.",
+      },
     },
-
+    social: {
+      facebook: { type: String, default: null },
+      twitter: { type: String, default: null },
+      instagram: { type: String, default: null },
+      linkedin: { type: String, default: null },
+      youtube: { type: String, default: null },
+      tiktok: { type: String, default: null },
+    },
     seo: {
       title: { type: String, default: null },
       description: { type: String, default: null },
       keywords: { type: String, default: null },
       author: { type: String, default: null },
-      robots: { type: String, default: null },
+      robots: { type: String, default: "index, follow" },
       google_site_verification: { type: String, default: null },
       bing_site_verification: { type: String, default: null },
       yandex_site_verification: { type: String, default: null },
@@ -70,11 +43,11 @@ const AppSettingsSchema = new Schema<AppSettingsDto>(
       pinterest_site_verification: { type: String, default: null },
     },
     settings: {
-      currency: { type: String, default: null },
-      language: { type: String, default: null },
-      timezone: { type: String, default: null },
-      date_format: { type: String, default: null },
-      time_format: { type: String, default: null },
+      currency: { type: String, default: "USD" },
+      language: { type: String, default: "en" },
+      timezone: { type: String, default: "UTC" },
+      date_format: { type: String, default: "YYYY-MM-DD" },
+      time_format: { type: String, default: "HH:mm" },
     },
     policy: {
       privacy: { type: String, default: null },
@@ -87,6 +60,7 @@ const AppSettingsSchema = new Schema<AppSettingsDto>(
   {
     timestamps: true,
     collection: "app-settings",
+    id: false, // Disable default 'id' virtual to avoid conflict with our 'id' field
     toJSON: {
       virtuals: true,
       transform: (_doc, ret) => {
@@ -99,6 +73,7 @@ const AppSettingsSchema = new Schema<AppSettingsDto>(
     toObject: { virtuals: true },
   },
 );
+
 export const AppSettings = model<AppSettingsDto>(
   "AppSettings",
   AppSettingsSchema,

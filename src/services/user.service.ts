@@ -1,5 +1,11 @@
 import { ApiError } from "../class/api.error";
 import { UserRepo, userRepo } from "../repo/user.repo";
+
+/**
+ * Design Pattern: Service Layer
+ * Purpose: Handles user-related business logic and operations.
+ * Responsibilities: User data retrieval, validation, and coordination with user repository.
+ */
 export class UserService {
   constructor(protected userRepo: UserRepo) {}
   async getUserHimself(userId: string) {

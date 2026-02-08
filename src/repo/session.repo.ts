@@ -1,6 +1,11 @@
 import { Session } from "../models/sessions.model";
 import type { SessionDto } from "../contract/sessions.dto";
 
+/**
+ * Design Pattern: Repository Pattern
+ * Purpose: Manages session data persistence and retrieval for authentication tokens.
+ * Responsibilities: Session CRUD operations, token-based queries, and multi-device session management.
+ */
 export class SessionRepository {
   async create(data: Partial<SessionDto>) {
     return await Session.create(data);
