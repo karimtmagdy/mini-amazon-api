@@ -5,6 +5,7 @@ import type { LoginUser } from "../schemas/auth.schema";
 import { CookieOptions } from "../lib/cookie-options";
 import { getUserAgent } from "../lib/user-agent";
 import type { GlobalResponse } from "../contract/global.dto";
+import { ApiError } from "../class/api.error";
 
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -46,6 +47,9 @@ export class AuthController {
   });
   refresh = catchError(async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      throw new ApiError("Refresh token is missing", 401);
+    }
     const { accessToken } = await this.authService.refresh(refreshToken);
     res.status(200).json({
       status: "success",

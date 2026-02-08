@@ -1,11 +1,10 @@
 import { type CookieOptions as ExpressCookieOptions } from "express";
-// import { jwtConfig } from "@/config/jwt.config";
+import { env } from "./env";
 
 export const CookieOptions: ExpressCookieOptions = {
   httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
-  secure: true, //jwtConfig.nodeEnv === "production", // Only send cookie over HTTPS in production
-  sameSite: "strict", // Prevent CSRF attacks
+  secure: env.nodeEnv === "production", // Only send cookie over HTTPS in production
+  sameSite: env.nodeEnv === "production" ? "none" : "lax", // Lax in dev, None in prod for cross-domain
   maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
   path: "/", // Cookie is accessible throughout the application
-  // signed: true, // Cookie is signed with a secret key
 };
