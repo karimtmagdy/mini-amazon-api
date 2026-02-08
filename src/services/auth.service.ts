@@ -98,11 +98,15 @@ export class AuthService {
     } as TokenPayload;
 
     const token = jwtUitl.generateAccessToken(payload);
-    const refreshToken = jwtUitl.generateRefreshToken(payload);
+    const refreshToken = jwtUitl.generateRefreshToken({ id: user.id }); // Minimal payload
 
     // 5. Create Session
     const expiresIn = (env.refreshExpiresIn as ms.StringValue) || "7d";
-    const expiresAt = new Date(Date.now() + ms(expiresIn));
+    const parsedMs = ms(expiresIn);
+
+    // Safety check: if ms() fails to parse, default to 7 days (604800000 ms)
+    const expiresDuration = typeof parsedMs === "number" ? parsedMs : ms("7d");
+    const expiresAt = new Date(Date.now() + expiresDuration);
 
     await this.sessionRepo.create({
       userId: user.id,
@@ -176,7 +180,7 @@ export class AuthService {
       },
     });
   }
-  
+
   async logout(refreshToken: string) {
     const session = await this.sessionRepo.findByToken(refreshToken);
     if (!session) return;
@@ -194,14 +198,21 @@ export class AuthService {
     await this.sessionRepo.deleteOtherSessions(userId, currentToken);
     await user?.updateOne({ $unset: { logoutAt: new Date() } });
   }
-  async refresh(refreshToken: string) {
+  async refresh(refreshToken: string, reqDeviceInfo: DeviceInfo) {
     const payload = jwtUitl.verifyRefreshToken(refreshToken);
     const session = await this.sessionRepo.findByToken(refreshToken);
     if (!session) throw new ApiError("Invalid or expired refresh token", 401);
+
     const user = await this.userRepo.findById(payload.id);
     if (!user || user.status !== "active") {
       throw new ApiError("User not found or inactive", 401);
     }
+
+    // Token Rotation Logic:
+    // 1. Delete the old session
+    await this.sessionRepo.deleteByToken(refreshToken);
+
+    // 2. Generate new tokens
     const newTokenPayload: TokenPayload = {
       id: user.id,
       email: user.email,
@@ -209,7 +220,24 @@ export class AuthService {
       role: user.role,
     };
     const accessToken = jwtUitl.generateAccessToken(newTokenPayload);
-    return { accessToken };
+    const newRefreshToken = jwtUitl.generateRefreshToken({ id: user.id });
+
+    // 3. Create new session
+    const expiresIn = (env.refreshExpiresIn as ms.StringValue) || "7d";
+    const parsedMs = ms(expiresIn);
+
+    // Safety check: if ms() fails to parse, default to 7 days
+    const expiresDuration = typeof parsedMs === "number" ? parsedMs : ms("7d");
+    const expiresAt = new Date(Date.now() + expiresDuration);
+
+    await this.sessionRepo.create({
+      userId: user.id,
+      refreshToken: newRefreshToken,
+      deviceInfo: reqDeviceInfo,
+      expiresAt,
+    });
+
+    return { accessToken, refreshToken: newRefreshToken };
   }
 }
 export const authService = new AuthService(

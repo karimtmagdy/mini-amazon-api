@@ -7,7 +7,6 @@ import { env } from "../lib/env";
 import compression from "compression";
 import hpp from "hpp";
 import morgan from "morgan";
-import { logger } from "../lib/logger";
 import helmet from "helmet";
 
 export function configApp(app: Express) {
@@ -38,7 +37,6 @@ export function configApp(app: Express) {
     const { geoDev } = require("../middlewares/geo-dev");
     app.use(geoDev);
     app.use(morgan("dev"));
-    logger.log("🛠 Using local MongoDB for development");
   }
   // 6. Rate Limiting
   // app.use(

@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { authService, type AuthService } from "../services/auth.service";
 import { catchError } from "../lib/catch.error";
 import type { LoginUser } from "../schemas/auth.schema";
-import { CookieOptions } from "../lib/cookie-options";
+import { BaseCookieOptions, CookieOptions } from "../lib/cookie-options";
 import { getUserAgent } from "../lib/user-agent";
 import type { GlobalResponse } from "../contract/global.dto";
 import { ApiError } from "../class/api.error";
@@ -28,9 +28,14 @@ export class AuthController {
     }>);
   });
   logout = catchError(async (req: Request, res: Response) => {
-    const refreshToken = req.cookies.refreshToken;
-    await this.authService.logout(refreshToken);
-    res.clearCookie("refreshToken", CookieOptions);
+    const cookies = req.cookies as { refreshToken?: string };
+    const refreshToken = cookies.refreshToken;
+
+    if (refreshToken) {
+      await this.authService.logout(refreshToken);
+    }
+
+    res.clearCookie("refreshToken", BaseCookieOptions);
     res.status(200).json({
       status: "success",
       message: "Logged out successfully",
@@ -38,19 +43,26 @@ export class AuthController {
   });
   logoutOtherDevices = catchError(async (req: Request, res: Response) => {
     const { id } = req.user;
-    const currentToken = req.cookies.refreshToken;
-    await this.authService.logoutOtherDevices(id, currentToken);
+    const cookies = req.cookies as { refreshToken?: string };
+    const currentToken = cookies.refreshToken;
+
+    await this.authService.logoutOtherDevices(id, currentToken || "");
     res.status(200).json({
       status: "success",
       message: "Logged out from other devices successfully",
     });
   });
   refresh = catchError(async (req: Request, res: Response) => {
-    const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) {
-      throw new ApiError("Refresh token is missing", 401);
-    }
-    const { accessToken } = await this.authService.refresh(refreshToken);
+    // We can cast here to tell TypeScript we are SURE it exists thanks to Zod
+    const { refreshToken: oldRefreshToken } = req.cookies as {
+      refreshToken: string;
+    };
+
+    const deviceInfo = getUserAgent(req);
+    const { accessToken, refreshToken: newRefreshToken } =
+      await this.authService.refresh(oldRefreshToken, deviceInfo);
+
+    res.cookie("refreshToken", newRefreshToken, CookieOptions);
     res.status(200).json({
       status: "success",
       message: "Token refreshed successfully",

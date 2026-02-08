@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authController } from "../../controllers/auth.controller";
 import { validate } from "../../middlewares/validate";
-import { loginUserSchema } from "../../schemas/auth.schema";
+import { loginUserSchema, refreshTokenSchema } from "../../schemas/auth.schema";
 import { authenticated } from "../../middlewares/authroized";
 
 const router = Router();
@@ -14,7 +14,11 @@ router.post(
   authenticated,
   authController.logoutOtherDevices,
 );
-router.post("/refresh-token", authController.refresh);
+router.post(
+  "/refresh-token",
+  validate(refreshTokenSchema),
+  authController.refresh,
+);
 export default {
   path: "/auth",
   router,

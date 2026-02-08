@@ -7,7 +7,6 @@ export const corsOption = () => {
     origin: (origin, callback) => {
       const { clientUrl, frontendUrl, globalUrl } = env;
       const allowedOrigins = [clientUrl, frontendUrl, globalUrl];
-      console.log(clientUrl);
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {

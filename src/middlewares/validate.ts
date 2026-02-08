@@ -7,7 +7,7 @@ import { ApiError } from "../class/api.error";
 export const validate =
   <T extends z.ZodTypeAny>(
     schema: T,
-    source: "body" | "query" | "params" | "all" = "all",
+    source: "body" | "query" | "params" | "cookies" | "all" = "all",
   ) =>
   (req: Request, _: Response, next: NextFunction) => {
     try {
@@ -18,10 +18,12 @@ export const validate =
           body: req.body || {},
           query: req.query || {},
           params: req.params || {},
+          cookies: req.cookies || {},
         }) as any;
         if (parsed.body) req.body = parsed.body;
         if (parsed.query) req.query = parsed.query;
         if (parsed.params) req.params = parsed.params;
+        if (parsed.cookies) req.cookies = parsed.cookies;
       } else {
         const parsed = schema.parse(req[source] || {});
         req[source] = parsed;

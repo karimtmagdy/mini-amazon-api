@@ -1,22 +1,22 @@
 import { Schema, Types, model } from "mongoose";
-import type { DeviceInfo, SessionDto } from "../contract/sessions.dto";
+import type { SessionDto } from "../contract/sessions.dto";
 
-const deviceInfoSchema = new Schema<DeviceInfo>(
+const deviceInfoSchema = new Schema(
   {
     browser: {
-      name: String,
-      version: String,
+      name: { type: String, default: "unknown" },
+      version: { type: String, default: "unknown" },
     },
     os: {
-      name: String,
-      version: String,
+      name: { type: String, default: "unknown" },
+      version: { type: String, default: "unknown" },
     },
-    engine: String,
-    cpu: String,
-    ip: String,
-    region: String,
-    city: String,
-    country: String,
+    engine: { type: String, default: "unknown" },
+    cpu: { type: String, default: "unknown" },
+    ip: { type: String, default: "unknown" },
+    region: { type: String, default: "unknown" },
+    city: { type: String, default: "unknown" },
+    country: { type: String, default: "unknown" },
   },
   { _id: false },
 );
