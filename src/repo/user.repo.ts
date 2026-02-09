@@ -1,6 +1,7 @@
 import { User } from "../models/user.model";
-import type { UserDto } from "../contract/user.dto";
+// import type { UserDto } from "../contract/user.dto";
 import { DEFAULT_USER_IMAGE } from "../contract/global.dto";
+// import { CreateUser } from "../schemas/user.schema";
 
 /**
  * Design Pattern: Repository Pattern
@@ -17,11 +18,14 @@ export class UserRepo {
   async findById(id: string) {
     return await User.findById(id);
   }
-  async create(user: UserDto) {
+  async findAll() {
+    return await User.find({}).select("+password").exec();
+  }
+  async create(user: any) {
     return await User.create(user);
   }
-  async update(user: UserDto) {
-    return await User.findByIdAndUpdate(user.id, user, {
+  async update(id: string, user: any) {
+    return await User.findByIdAndUpdate(id, user, {
       new: true,
       runValidators: true,
     });
@@ -40,13 +44,19 @@ export class UserRepo {
       { new: true },
     );
   }
+  async changeRole(id: string, role: string) {
+    return await User.findByIdAndUpdate(
+      id,
+      { role },
+      { new: true, runValidators: true },
+    );
+  }
   async updateStatus(id: string, status: string) {
-    const user = await User.findByIdAndUpdate(
+    return await User.findByIdAndUpdate(
       id,
       { status },
       { new: true, runValidators: true },
     );
-    return user;
   }
   async deactivate(id: string) {
     return await User.findByIdAndUpdate(
@@ -66,7 +76,7 @@ export class UserRepo {
       { new: true },
     );
   }
-  async deleteBulkUsers(ids: string[]) {
+  async deleteBulk(ids: string[]) {
     return await User.updateMany(
       { id: { $in: ids } },
       { status: "inactive", deletedAt: new Date() },
