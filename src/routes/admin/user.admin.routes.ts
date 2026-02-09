@@ -2,8 +2,11 @@ import { Router } from "express";
 import { userController } from "../../controllers/user.controller";
 import { authenticated, checkPermission } from "../../middlewares/authroized";
 import { validate } from "../../middlewares/validate";
-import { createUserZod } from "../../schemas/user.schema";
-import { idParamSchema } from "src/schemas/standred.schema";
+import { changeRoleZod, createUserZod } from "../../schemas/user.schema";
+import {
+  idParamSchema,
+  multipleBulkDeleteSchema,
+} from "../../schemas/standred.schema";
 
 const router = Router();
 router.use(authenticated, checkPermission(["admin"]));
@@ -21,8 +24,18 @@ router
     userController.deleteSoftByAdmin,
   );
 
-// router.patch("/role/:id");
-// router.patch("/status/:id");
+router.patch(
+  "/role/:id",
+  validate(changeRoleZod),
+  checkPermission(["admin"]),
+  userController.changeRoleByAdmin,
+);
+router.patch(
+  "/status/:id",
+  checkPermission(["admin"]),
+  validate(idParamSchema),
+  userController.updateStatusByAdmin,
+);
 router.patch(
   "/deactivate/:id",
   checkPermission(["admin"]),
@@ -35,7 +48,12 @@ router.patch(
   validate(idParamSchema),
   userController.unlockByAdmin,
 );
-// router.delete("/bulk");
+router.delete(
+  "/bulk",
+  checkPermission(["admin"]),
+  validate(multipleBulkDeleteSchema),
+  userController.deleteBulk,
+);
 export default {
   path: "/users",
   router,

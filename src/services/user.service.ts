@@ -62,13 +62,12 @@ export class UserService {
     const data = await this.userRepo.deactivate(userId);
     return { data };
   }
-  // DELETE
-  async deleteHimself(userId: string) {
-    const user = await this.userRepo.findById(userId);
-    if (!user) throw new ApiError("User not found", 404);
-    const data = await this.userRepo.softDelete(userId);
-    return { data };
-  }
+  // async reactivateByAdmin(userId: string) {
+  //   const user = await this.userRepo.findById(userId);
+  //   if (!user) throw new ApiError("User not found", 404);
+  //   const data = await this.userRepo.reactivate(userId);
+  //   return { data };
+  // }
   async softDeleteByAdmin(id: string) {
     const user = await this.userRepo.findById(id);
     if (!user) throw new ApiError("User not found", 404);

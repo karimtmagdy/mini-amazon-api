@@ -3,11 +3,7 @@ import { UserService, userService } from "../services/user.service";
 import { catchError } from "../lib/catch.error";
 import { GlobalResponse } from "../contract/global.dto";
 import { UserDto } from "../contract/user.dto";
-import {
-  CreateUser,
-  UpdateUser,
-  UpdateUserProfile,
-} from "src/schemas/user.schema";
+import { CreateUser, UpdateUser, UpdateUserRole } from "../schemas/user.schema";
 
 /**
  * Design Pattern: MVC Controller
@@ -16,14 +12,7 @@ import {
  */
 export class UserController {
   constructor(protected userService: UserService) {}
-  getUserHimself = catchError(async (req: Request, res: Response) => {
-    const id = req.user.id;
-    const { data } = await this.userService.getHimself(id);
-    return res.status(200).json({
-      status: "success",
-      data: data as UserDto,
-    } satisfies GlobalResponse<UserDto>);
-  });
+
   createUser = catchError(async (req: Request, res: Response) => {
     const validatedData = req.body as CreateUser;
     const { data } = await this.userService.createByAdmin(validatedData);
@@ -50,18 +39,14 @@ export class UserController {
       data: data as UserDto[],
     } satisfies GlobalResponse<UserDto[]>);
   });
-  updateUserHimself = catchError(async (req: Request, res: Response) => {
-    const id = req.user.id;
-    const validatedData = req.body as UpdateUserProfile;
-    const { data } = await this.userService.updateUserHimself(
-      id,
-      validatedData,
-      // req.file,
-    );
+  changeRoleByAdmin = catchError(async (req: Request, res: Response) => {
+    const { id } = req.params as { id: string };
+    const validatedData = req.body as UpdateUserRole;
+    const { data } = await this.userService.changeRole(id, validatedData);
     return res.status(200).json({
       status: "success",
-      message: "your information have been updated",
-      data,
+      message: `user role has been changed to ${validatedData}`,
+      data: data as UserDto,
     } satisfies GlobalResponse<UserDto>);
   });
   updateUserByAdmin = catchError(async (req: Request, res: Response) => {
@@ -101,24 +86,25 @@ export class UserController {
       data: data as UserDto,
     } satisfies GlobalResponse<UserDto>);
   });
-  deactivateAccount = catchError(async (req: Request, res: Response) => {
-    const id = req.user.id;
-    const { data } = await this.userService.deactivateByAdmin(id);
+  updateStatusByAdmin = catchError(async (req: Request, res: Response) => {
+    const { id } = req.params as { id: string };
+    const validatedData = req.body //as UpdateUserStatus;
+    const { data } = await this.userService.updateStatus(id, validatedData);
     return res.status(200).json({
       status: "success",
-      message: "your account has been deactivated",
+      message: "user status has been updated",
       data: data as UserDto,
     } satisfies GlobalResponse<UserDto>);
   });
-  deleteHimself = catchError(async (req: Request, res: Response) => {
-    const id = req.user.id;
-    const { data } = await this.userService.deleteHimself(id);
-    return res.status(200).json({
-      status: "success",
-      message: "your account has been deleted",
-      data: data as UserDto,
-    } satisfies GlobalResponse<UserDto>);
-  });
+  // reactivateByAdmin = catchError(async (req: Request, res: Response) => {
+  //   const { id } = req.params as { id: string };
+  //   const { data } = await this.userService.reactivateByAdmin(id);
+  //   return res.status(200).json({
+  //     status: "success",
+  //     message: "user has been reactivated",
+  //     data: data as UserDto,
+  //   } satisfies GlobalResponse<UserDto>);
+  // });
   deleteBulk = catchError(async (req: Request, res: Response) => {
     const { ids } = req.body as { ids: string[] };
     const { data } = await this.userService.deleteBulk(ids);
