@@ -41,6 +41,32 @@ export class UserRepo {
       { new: true },
     );
   }
+  async updateStatus(id: string, status: string) {
+    const user = await User.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true, runValidators: true },
+    );
+    return user;
+  }
+  async deactivate(id: string) {
+    return await User.findByIdAndUpdate(
+      id,
+      { status: "deactivated" },
+      { new: true },
+    );
+  }
+  async unlock(id: string) {
+    return await User.findByIdAndUpdate(
+      id,
+      {
+        status: "active",
+        lockedUntil: null,
+        failedLoginAttempts: 0,
+      },
+      { new: true },
+    );
+  }
   async deleteBulkUsers(ids: string[]) {
     return await User.updateMany(
       { id: { $in: ids } },
