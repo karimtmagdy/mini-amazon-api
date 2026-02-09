@@ -10,7 +10,7 @@ cloudinary.config({
 });
 
 export class CloudinaryService {
-  static async uploadSinglePhoto(filePath: string, folder: string = "uploads") {
+  async uploadSinglePhoto(filePath: string, folder: string = "uploads") {
     try {
       const result = await cloudinary.uploader.upload(filePath, {
         folder,
@@ -23,10 +23,7 @@ export class CloudinaryService {
     }
   }
 
-  static async uploadMultiplePhotos(
-    filePaths: string[],
-    folder: string = "uploads",
-  ) {
+  async uploadMultiplePhotos(filePaths: string[], folder: string = "uploads") {
     try {
       if (!filePaths || filePaths.length === 0) return [];
       const uploadPromises = filePaths.map((path) =>
@@ -39,7 +36,7 @@ export class CloudinaryService {
     }
   }
 
-  static async deletePhoto(publicId: string) {
+  async deletePhoto(publicId: string) {
     try {
       if (!publicId) return;
       const result = await cloudinary.uploader.destroy(publicId);
@@ -50,7 +47,7 @@ export class CloudinaryService {
     }
   }
 
-  static async deleteMultiplePhotos(publicIds: string[]) {
+  async deleteMultiplePhotos(publicIds: string[]) {
     try {
       if (!publicIds || publicIds.length === 0) return;
       const deletePromises = publicIds.map((id) =>
@@ -63,3 +60,4 @@ export class CloudinaryService {
     }
   }
 }
+export const cloudService = new CloudinaryService();
