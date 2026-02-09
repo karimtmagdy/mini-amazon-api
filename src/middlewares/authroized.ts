@@ -21,7 +21,7 @@ export const authenticated = catchError(
   },
 );
 
-export const checkPermission = (roles: UserRole[] = ["admin", "user"]) =>
+export const checkPermission = (roles: UserRole[] = ["admin"]) =>
   catchError(async (req: Request, _: Response, next: NextFunction) => {
     const user = req.user;
     const requiredRoles = Array.isArray(roles) ? roles : [roles];

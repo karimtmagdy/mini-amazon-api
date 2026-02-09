@@ -32,7 +32,6 @@ export class UserRepo {
       {
         status: "archived",
         deletedAt: new Date(),
-        // refreshTokens: [],
         image: {
           secureUrl: DEFAULT_USER_IMAGE,
           publicId: null,
