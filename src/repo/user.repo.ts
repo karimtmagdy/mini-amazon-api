@@ -74,3 +74,21 @@ export class UserRepo {
   }
 }
 export const userRepo = new UserRepo();
+  // async findAll(query: { includeDeleted?: boolean; status?: string } = {}) {
+  //   // const apiFeature = new ApiFeature(User.find(), query);
+  //   // apiFeature.filter().sort().fields().search().pagination();
+  //   const filter: any = {};
+
+  //   if (query.status) {
+  //     filter.status = query.status;
+  //   } else if (!query.includeDeleted) {
+  //     filter.status = { $ne: "deleted" };
+  //     filter.deletedAt = { $exists: false };
+  //   }
+  //   return await User.find(filter)
+  //     .select(
+  //       "+presence +lockedUntil +failedLoginAttempts +createdBy +updatedBy +deletedBy",
+  //     )
+  //     .populate("createdBy updatedBy deletedBy", "username email name image")
+  //     .sort({ createdAt: -1 });
+  // }
