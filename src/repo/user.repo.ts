@@ -17,14 +17,14 @@ export class UserRepo {
   async findById(id: string) {
     return await User.findById(id);
   }
-  //   async findByRefreshToken(refreshToken: string) {
-  //     return await Session.findOne({ refreshToken });
-  //   }
   async create(user: UserDto) {
     return await User.create(user);
   }
   async update(user: UserDto) {
-    return await User.findByIdAndUpdate(user.id, user, { new: true });
+    return await User.findByIdAndUpdate(user.id, user, {
+      new: true,
+      runValidators: true,
+    });
   }
   async softDelete(id: string) {
     return await User.findByIdAndUpdate(
