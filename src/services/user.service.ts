@@ -11,8 +11,8 @@ import fs from "fs";
  */
 export class UserService {
   constructor(protected userRepo: UserRepo) {}
-  async getHimself(userId: string) {
-    const data = await this.userRepo.findById(userId);
+  async getUserById(id: string) {
+    const data = await this.userRepo.findById(id);
     if (!data) throw new ApiError("User not found", 404);
     return { data };
   }

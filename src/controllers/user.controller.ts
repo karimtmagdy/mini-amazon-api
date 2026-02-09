@@ -35,7 +35,7 @@ export class UserController {
   });
   getOneUser = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
-    const { data } = await this.userService.getHimself(id);
+    const { data } = await this.userService.getUserById(id);
     return res.status(200).json({
       status: "success",
       message: "user retrieved successfully",
