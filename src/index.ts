@@ -1,7 +1,6 @@
 import express from "express";
 import "dotenv/config";
 import { Database } from "./config/data/db";
-
 import { setupRoutes } from "./routes";
 import { configApp } from "./config/config-app";
 

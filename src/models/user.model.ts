@@ -1,3 +1,6 @@
+import { Schema, model } from "mongoose";
+import slugify from "slugify";
+import bcrypt from "bcryptjs";
 import { DEFAULT_USER_IMAGE } from "../contract/global.dto";
 import {
   USER_ACCOUNT_STATUS,
@@ -6,9 +9,6 @@ import {
   USER_STATE,
   type UserDto,
 } from "../contract/user.dto";
-import { Schema, model } from "mongoose";
-import slugify from "slugify";
-import bcrypt from "bcryptjs";
 
 const UserSchema = new Schema<UserDto>(
   {

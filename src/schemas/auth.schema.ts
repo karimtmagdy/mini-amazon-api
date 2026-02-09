@@ -1,4 +1,4 @@
-import * as z from "zod";
+import * as z from "zod/v4";
 import type { UserDto } from "../contract/user.dto";
 
 export const emailRegex: RegExp =
@@ -31,7 +31,9 @@ export const registerUserSchema = z.object({
       path: ["confirmPassword"],
     }),
 }) satisfies z.ZodType<{
-  body: Pick<UserDto, "username" | "email" | "password">;
+  body: Pick<UserDto, "username" | "email" | "password"> & {
+    confirmPassword: string;
+  };
 }>;
 export const loginUserSchema = z.object({
   body: z.object({
@@ -89,7 +91,7 @@ export const forgotPasswordSchema = z.object({
       .email("Invalid email format")
       .transform((email) => email.toLowerCase()),
   }),
-}) satisfies z.ZodType<{ body: Pick<UserDto, "email"> }>;
+});
 export const deactivateUserSchema = z.object({
   body: z.object({
     password: z.string({
