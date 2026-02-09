@@ -1,7 +1,11 @@
 // import { UserDto } from "../contract/user.dto";
 import { ApiError } from "../class/api.error";
 import { UserRepo, userRepo } from "../repo/user.repo";
-import { CreateUser, UpdateUser, UpdateUserProfile } from "../schemas/user.schema";
+import {
+  CreateUser,
+  UpdateUser,
+  UpdateUserProfile,
+} from "../schemas/user.schema";
 import { cloudService } from "../config/cloudinary";
 import fs from "fs";
 /**
