@@ -1,11 +1,11 @@
 import type { Request, Response } from "express";
 import { authService, type AuthService } from "../services/auth.service";
 import { catchError } from "../lib/catch.error";
-import type { LoginUser } from "../schemas/auth.schema";
+import type { LoginUser } from "../schemas/user.schema";
 import { BaseCookieOptions, CookieOptions } from "../lib/cookie-options";
 import { getUserAgent } from "../lib/user-agent";
 import type { GlobalResponse } from "../contract/global.dto";
-import { ApiError } from "../class/api.error";
+// import { ApiError } from "../class/api.error";
 
 /**
  * Design Pattern: MVC Controller
