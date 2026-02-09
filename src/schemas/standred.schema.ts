@@ -18,14 +18,9 @@ export const idParamSchema = z.object({
       .regex(/^[0-9a-fA-F]{24}$/, "Invalid ID"),
   }),
 }) satisfies z.ZodType<{ params: { id: string } }>;
-export const idSchema = z.object({
-  id: z
-    .string({ error: "ID is required" })
-    .regex(/^[0-9a-fA-F]{24}$/, "Invalid ID"),
-});
+
 export type DateParam = z.infer<typeof dateParamSchema>;
-export type IdParam = z.infer<typeof idParamSchema>["params"]["id"];
-export type Id = z.infer<typeof idSchema>["id"];
+export type IdParam = z.infer<typeof idParamSchema>["params"];
 export type QueryString = {
   search: string;
   sort: string;
