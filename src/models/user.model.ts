@@ -79,9 +79,11 @@ const UserSchema = new Schema<UserDto>(
     // cart: [
     //   {
     //     type: { type: String },
-    //     productId: { type: Schema.Types.ObjectId, ref: "Product" },
+    //     productId: { type: Types.ObjectId, ref: "Product" },
     //   },
     // ],
+    // resetPasswordExpireAt: { type: Date, select: false },
+    // resetPasswordToken: { type: String, select: false },
     // wishlist: [{ type: Schema.Types.ObjectId, ref: "Wishlist", select: false }],
     // verified: { type: Boolean, default: false, select: false },
     // verifiedAt: { type: Date, select: false },
@@ -104,6 +106,7 @@ const UserSchema = new Schema<UserDto>(
     toObject: { virtuals: true },
   },
 );
+
 UserSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
   const salt = await bcrypt.genSalt(10);

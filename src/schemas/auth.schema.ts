@@ -90,7 +90,6 @@ export const forgotPasswordSchema = z.object({
       .transform((email) => email.toLowerCase()),
   }),
 }) satisfies z.ZodType<{ body: Pick<UserDto, "email"> }>;
-
 export const deactivateUserSchema = z.object({
   body: z.object({
     password: z.string({
@@ -100,7 +99,6 @@ export const deactivateUserSchema = z.object({
 }) satisfies z.ZodType<{
   body: Pick<UserDto, "password">;
 }>;
-
 export const refreshTokenSchema = z.object({
   cookies: z.object({
     refreshToken: z.string({

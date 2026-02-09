@@ -17,4 +17,4 @@ export class ApiError extends Error {
     Error.captureStackTrace(this, this.constructor);
   }
 }
-export const apiError = new ApiError("An unknown error occurred", 500);
+// export const apiError = new ApiError();
