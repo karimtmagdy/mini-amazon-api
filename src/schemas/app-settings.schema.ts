@@ -49,11 +49,7 @@ export const updateAppSettingsSchema = z.object({
     }),
   }),
 }) 
-// satisfies z.ZodType<{
-//   body: Partial<Omit<AppSettingsDto, "id" | "createdAt" | "updatedAt">>;
-// }>;
-// "general" | "system" | "social" | "seo" | "settings" | "policy"
-// z.ZodType<{ body: Pick<UserDto, "email"> }>
+ 
 export const getAppSettingsSchema = z.object({
   body: z.object({
     policy: z.object({
@@ -101,4 +97,4 @@ export const getAppSettingsSchema = z.object({
       favicon: z.string().nullable().optional(),
     }),
   }),
-})// satisfies z.ZodType<Partial<Omit<AppSettingsDto, "id" | "createdAt" | "updatedAt">>>;
+}).strict();
