@@ -26,36 +26,12 @@ export class UserService {
     const data = await this.userRepo.findAll();
     return { data };
   }
-  async updateUserHimself(
-    userId: string,
-    user: Partial<UpdateUserProfile>,
-    file?: Express.Multer.File,
-  ) {
-    if (file) {
-      const { secureUrl, publicId } = await cloudService.uploadSinglePhoto(
-        file.path,
-        "users",
-      );
-      const currentUser = await this.userRepo.findById(userId);
-      if (currentUser?.image?.publicId) {
-        await cloudService.deletePhoto(currentUser.image.publicId);
-      }
-      user.image = { secureUrl, publicId };
-      fs.unlinkSync(file.path);
-    }
-    const data = await this.userRepo.update(userId, user);
-    if (!data) throw new ApiError("User not found", 404);
-    return { data };
-  }
-
   async update(userId: string, user: UpdateUser) {
     const exists = await this.userRepo.findById(userId);
     if (!exists) throw new ApiError("User not found", 404);
     const data = await this.userRepo.update(userId, user);
     return { data };
   }
-
-  // UPDATE
   async changeRole(id: string, role: string) {
     const user = await this.userRepo.findById(id);
     if (!user) throw new ApiError("User not found", 404);
