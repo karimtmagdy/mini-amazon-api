@@ -1,6 +1,11 @@
 import * as z from "zod/v4";
 import type { UserDto } from "../contract/user.dto";
 
+// // Type helper to ensure fields exist in UserDto
+// type EnsureFields<T extends keyof UserDto> = {
+//   [K in T]: UserDto[K];
+// };
+
 export const emailRegex: RegExp =
   /^[a-zA-Z0-9._%+-]+@(gmail|yahoo|outlook|hotmail)\.(com|net|org)$/;
 
@@ -31,7 +36,10 @@ export const registerUserSchema = z.object({
       path: ["confirmPassword"],
     }),
 }) satisfies z.ZodType<{
-  body: Pick<UserDto, "username" | "email" | "password"> & {
+  body: {
+    username: string;
+    email: string;
+    password: string;
     confirmPassword: string;
   };
 }>;
@@ -48,9 +56,7 @@ export const loginUserSchema = z.object({
       .min(6, { message: "Password must be at least 6 characters" })
       .max(30, { message: "Password must be at most 30 characters" }),
   }),
-}) satisfies z.ZodType<{
-  body: Pick<UserDto, "email" | "password">;
-}>;
+}) satisfies z.ZodType<{ body: { email: string; password: string } }>;
 export const resetPasswordSchema = z.object({
   body: z
     .object({
@@ -91,16 +97,14 @@ export const forgotPasswordSchema = z.object({
       .email("Invalid email format")
       .transform((email) => email.toLowerCase()),
   }),
-});
+}) satisfies z.ZodType<{ body: { email: string } }>;
 export const deactivateUserSchema = z.object({
   body: z.object({
     password: z.string({
       message: "Password is required to confirm deactivation",
     }),
   }),
-}) satisfies z.ZodType<{
-  body: Pick<UserDto, "password">;
-}>;
+}) satisfies z.ZodType<{ body: { password: string } }>;
 export const refreshTokenSchema = z.object({
   cookies: z.object({
     refreshToken: z.string({
