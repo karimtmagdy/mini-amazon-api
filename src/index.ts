@@ -3,6 +3,7 @@ import "dotenv/config";
 import { Database } from "./config/data/db";
 import { setupRoutes } from "./routes";
 import { configApp } from "./config/config-app";
+import { MiddlewareApplication } from "./middlewares/error.middlewares";
 
 const app = express();
 configApp(app);
@@ -17,7 +18,6 @@ const initDb = async () => {
 };
 
 initDb();
-
 setupRoutes(app);
 app.get(["/", "/health"], (_req, res) => {
   res.status(200).json({
@@ -31,5 +31,6 @@ app.get(["/", "/health"], (_req, res) => {
     environment: "production",
   });
 });
+MiddlewareApplication(app);
 
 export default app;
