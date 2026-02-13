@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "outDir": "./dist",
     "rootDir": "./src",
 
     // Module system - Choose based on your setup
-    "module": "esnext",
+    "module": "commonjs",
     "moduleResolution": "node",
     "target": "esnext",
     "lib": ["ES2022"],

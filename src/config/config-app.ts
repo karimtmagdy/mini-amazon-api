@@ -8,7 +8,7 @@ import compression from "compression";
 import hpp from "hpp";
 import morgan from "morgan";
 import helmet from "helmet";
-import { geoDev } from "../middlewares/geo-dev";
+// import { geoDev } from "../middlewares/geo-dev";
 
 export function configApp(app: Express) {
   app.set("trust proxy", 1);
@@ -35,7 +35,7 @@ export function configApp(app: Express) {
 
   // 5. Logging & Dev Tools (Development only)
   if (env.nodeEnv === "development") {
-    app.use(geoDev);
+    // app.use(geoDev);
     app.use(morgan("dev"));
   }
   // 6. Rate Limiting
