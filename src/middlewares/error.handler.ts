@@ -62,23 +62,22 @@ export function errorHandler(
 
   // 5. Zod Validation Error
   if (err instanceof z.ZodError || err.name === "ZodError") {
+    // const issues = err.issues || [];
+    // const firstIssue = issues[0];
+
+    // const formatPath = (path: (string | number | symbol)[]) => {
+    //   if (
+    //     path.length > 1 &&
+    //     ["body", "query", "params", "cookies"].includes(String(path[0]))
+    //   ) {
+    //     return path.slice(1).join(".");
+    //   }
+    //   return path.join(".") || "field";
+    // };
     const issues = err.issues || [];
-    const firstIssue = issues[0];
-
-    const formatPath = (path: (string | number | symbol)[]) => {
-      if (
-        path.length > 1 &&
-        ["body", "query", "params", "cookies"].includes(String(path[0]))
-      ) {
-        return path.slice(1).join(".");
-      }
-      return path.join(".") || "field";
-    };
-
-    const mainIssue = firstIssue ? firstIssue.message : "Validation failed";
-
+    const mainIssue = issues[0].message;
     const formattedErrors = issues.map((issue: z.ZodIssue) => ({
-      field: formatPath(issue.path),
+      field: issue.path.join("."),
       message: issue.message,
     }));
 
