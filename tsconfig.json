@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "outDir": "dist",
+    "outDir": "./dist",
     "rootDir": "./src",
 
     // Module system - Choose based on your setup

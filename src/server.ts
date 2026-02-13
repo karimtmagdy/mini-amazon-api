@@ -1,5 +1,5 @@
 // import "module-alias/register"; // enable @alias imports at runtime
-import { connection } from "mongoose";
+import mongoose from "mongoose";
 import "dotenv/config";
 import app from "./app";
 import { Database } from "./config/data/db";
@@ -11,9 +11,11 @@ const PORT = env.port;
 // injectSpeedInsights();
 void (async () => {
   try {
-    app.listen(PORT, () => {
-      logger.log(`Started on port ${PORT}`);
-    });
+    if (env.nodeEnv !== "production") {
+      app.listen(PORT, () => {
+        logger.log(`Started on port ${PORT}`);
+      });
+    }
     await Database.getInstance();
   } catch (error) {
     logger.error("🔥 Failed to start server:", error);
@@ -36,7 +38,7 @@ process.on("EADDRINUSE", (error: NodeJS.ErrnoException) => {
 const gracefulShutdown = async (signal: string) => {
   logger.log(`👋 Received ${signal}. Shutting down gracefully...`);
   try {
-    await connection.close();
+    await mongoose.connection.close();
     logger.log("✅ MongoDB connection closed.");
     process.exit(0);
   } catch (err) {
