@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "builds": [{ "src": "src/app.ts", "use": "@vercel/node" }],
-  "routes": [{ "src": "/(.*)", "dest": "src/app.ts" }],
-  "crons": [{ "path": "/src/app.ts", "schedule": "0 10 * * *" }]
+  "builds": [{ "src": "src/index.ts", "use": "@vercel/node" }],
+  "routes": [{ "src": "/(.*)", "dest": "src/index.ts" }],
+  "crons": [{ "path": "/src/index.ts", "schedule": "0 10 * * *" }]
 }
