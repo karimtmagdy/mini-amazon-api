@@ -5,9 +5,9 @@
     "rootDir": "./src",
 
     // Module system - Choose based on your setup
-    "module": "node20",
+    "module": "esnext",
     "moduleResolution": "node",
-    "target": "ES2022",
+    "target": "esnext",
     "lib": ["ES2022"],
     "types": ["node"], // ✅ Enable Node types
 

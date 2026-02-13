@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Mini Express + Mongoose + Zod + TypeScript API for Vercel",
   "main": "src/index.ts",
-  "type": "module",
   "engines": {
     "node": "22.x"
   },
