@@ -5,7 +5,7 @@
     "rootDir": "./src",
 
     // Module system - Choose based on your setup
-    "module": "NodeNext",
+    "module": "es2015",
     "moduleResolution": "bundler",
     "target": "ES2022",
     "lib": ["ES2022"],
