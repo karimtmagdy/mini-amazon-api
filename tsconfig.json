@@ -5,17 +5,17 @@
     "rootDir": "./src",
 
     // Module system - Choose based on your setup
-    "module": "es2015",
-    "moduleResolution": "bundler",
+    "module": "node20",
+    "moduleResolution": "node",
     "target": "ES2022",
     "lib": ["ES2022"],
     "types": ["node"], // ✅ Enable Node types
 
     // Build options
-    "sourceMap": true,
-    "declaration": false,
+    // "sourceMap": true,
+    // "declaration": false,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    // "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
 
     // Strict checks
@@ -28,7 +28,7 @@
 
     // Isolated modules (required for some bundlers)
     "isolatedModules": true,
-    "verbatimModuleSyntax": false, // ⚠️ May conflict with CommonJS
+    // "verbatimModuleSyntax": false, // ⚠️ May conflict with CommonJS
 
     "noEmitOnError": false
   },
