@@ -65,14 +65,21 @@ export function errorHandler(
     const issues = err.issues || [];
     const firstIssue = issues[0];
 
-    const mainIssue = firstIssue
-      ? `Invalid ${firstIssue.path.join(".")}: ${firstIssue.message}.`
-      : "Validation failed";
+    const formatPath = (path: (string | number | symbol)[]) => {
+      if (
+        path.length > 1 &&
+        ["body", "query", "params", "cookies"].includes(String(path[0]))
+      ) {
+        return path.slice(1).join(".");
+      }
+      return path.join(".") || "field";
+    };
+
+    const mainIssue = firstIssue ? firstIssue.message : "Validation failed";
 
     const formattedErrors = issues.map((issue: z.ZodIssue) => ({
-      field: issue.path.join(".") || "unknown",
+      field: formatPath(issue.path),
       message: issue.message,
-      code: issue.code,
     }));
 
     return res.status(400).json({

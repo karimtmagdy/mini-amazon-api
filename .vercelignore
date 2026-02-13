@@ -72,6 +72,3 @@ desktop.ini
 __tests__/
 coverage/
 .nyc_output/
-
-/ZOD_V4_GUIDE.md
-/src/schemas/zod-v4-methods.ts

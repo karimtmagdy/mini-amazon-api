@@ -4,7 +4,7 @@ import { authenticated, checkPermission } from "../../middlewares/authroized";
 import { validate } from "../../middlewares/validate";
 import { changeRoleZod, createUserZod } from "../../schemas/user.schema";
 import {
-  idParamSchema,
+  idParamZod,
   multipleBulkDeleteSchema,
 } from "../../schemas/standred.schema";
 
@@ -12,14 +12,14 @@ const router = Router();
 router.use(authenticated, checkPermission(["admin"]));
 router
   .route("/")
-  .get(userController.getAllUsers)
-  .post(validate(createUserZod), userController.createUser);
+  .get(userController.getAll)
+  .post(validate(createUserZod), userController.create);
 
 router
   .route("/:id")
-  .get(validate(idParamSchema), userController.getOneUser)
+  .get(validate(idParamZod), userController.getOne)
   .delete(
-    validate(idParamSchema),
+    validate(idParamZod),
     checkPermission(["admin"]),
     userController.deleteSoftByAdmin,
   );
@@ -33,19 +33,19 @@ router.patch(
 router.patch(
   "/status/:id",
   checkPermission(["admin"]),
-  validate(idParamSchema),
+  validate(idParamZod),
   userController.updateStatusByAdmin,
 );
 router.patch(
   "/deactivate/:id",
   checkPermission(["admin"]),
-  validate(idParamSchema),
+  validate(idParamZod),
   userController.deactivateByAdmin,
 );
 router.patch(
   "/unlock/:id",
   checkPermission(["admin"]),
-  validate(idParamSchema),
+  validate(idParamZod),
   userController.unlockByAdmin,
 );
 router.delete(

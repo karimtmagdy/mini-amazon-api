@@ -76,7 +76,7 @@ export const changeRoleZod = z.object({
   body: defaultUserZod
     .clone()
     .shape.body.shape.role.refine((role) => USER_ROLES.includes(role), {
-      message: "Please select a valid role",
+      message: "select a valid role",
     }),
 });
 

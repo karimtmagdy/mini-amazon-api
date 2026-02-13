@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { profileService, ProfileService } from "../services/profile.service";
 import { catchError } from "../lib/catch.error";
-import { GlobalResponse } from "../contract/global.dto";
 import { UserDto } from "../contract/user.dto";
 import { UpdateUserProfile } from "../schemas/user.schema";
+import { GlobalResponse } from "../schemas/standred.schema";
 
 /**
  * Design Pattern: MVC Controller
@@ -14,25 +14,25 @@ export class ProfileController {
   constructor(protected profileService: ProfileService) {}
   getUserHimself = catchError(async (req: Request, res: Response) => {
     const id = req.user.id;
-    const { data } = await this.profileService.getHimself(id);
+    const { user } = await this.profileService.getHimself(id);
     return res.status(200).json({
       status: "success",
-      data: data as UserDto,
+      data: user as UserDto,
     } satisfies GlobalResponse<UserDto>);
   });
   deleteImage = catchError(async (req: Request, res: Response) => {
     const id = req.user.id;
-    const { data } = await this.profileService.deleteImage(id);
+    const { user } = await this.profileService.deleteImage(id);
     return res.status(200).json({
       status: "success",
       message: "your image has been deleted",
-      data: data as UserDto,
+      data: user as UserDto,
     } satisfies GlobalResponse<UserDto>);
   });
   updateUserHimself = catchError(async (req: Request, res: Response) => {
     const id = req.user.id;
     const validatedData = req.body as UpdateUserProfile;
-    const { data } = await this.profileService.updateUserHimself(
+    const { user } = await this.profileService.updateUserHimself(
       id,
       validatedData,
       // req.file,
@@ -40,26 +40,26 @@ export class ProfileController {
     return res.status(200).json({
       status: "success",
       message: "your information have been updated",
-      data,
+      data: user as UserDto,
     } satisfies GlobalResponse<UserDto>);
   });
 
   deactivateAccount = catchError(async (req: Request, res: Response) => {
     const id = req.user.id;
-    const { data } = await this.profileService.deactivateAccount(id);
+    const { user } = await this.profileService.deactivateAccount(id);
     return res.status(200).json({
       status: "success",
       message: "your account has been deactivated",
-      data: data as UserDto,
+      data: user as UserDto,
     } satisfies GlobalResponse<UserDto>);
   });
   deleteHimself = catchError(async (req: Request, res: Response) => {
     const id = req.user.id;
-    const { data } = await this.profileService.deleteHimself(id);
+    const { user } = await this.profileService.deleteHimself(id);
     return res.status(200).json({
       status: "success",
       message: "your account has been deleted",
-      data: data as UserDto,
+      data: user as UserDto,
     } satisfies GlobalResponse<UserDto>);
   });
 }

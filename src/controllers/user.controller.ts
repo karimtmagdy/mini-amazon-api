@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { UserService, userService } from "../services/user.service";
 import { catchError } from "../lib/catch.error";
-import { GlobalResponse } from "../contract/global.dto";
+import { GlobalResponse } from "../schemas/standred.schema";
 import { UserDto } from "../contract/user.dto";
 import { CreateUser, UpdateUser, UpdateUserRole } from "../schemas/user.schema";
 
@@ -13,7 +13,7 @@ import { CreateUser, UpdateUser, UpdateUserRole } from "../schemas/user.schema";
 export class UserController {
   constructor(protected userService: UserService) {}
 
-  createUser = catchError(async (req: Request, res: Response) => {
+  create = catchError(async (req: Request, res: Response) => {
     const validatedData = req.body as CreateUser;
     const { data } = await this.userService.createByAdmin(validatedData);
     return res.status(200).json({
@@ -22,7 +22,7 @@ export class UserController {
       data,
     } satisfies GlobalResponse<UserDto>);
   });
-  getOneUser = catchError(async (req: Request, res: Response) => {
+  getOne = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
     const { data } = await this.userService.getUserById(id);
     return res.status(200).json({
@@ -31,7 +31,7 @@ export class UserController {
       data,
     } satisfies GlobalResponse<UserDto>);
   });
-  getAllUsers = catchError(async (req: Request, res: Response) => {
+  getAll = catchError(async (req: Request, res: Response) => {
     const { data } = await this.userService.getAll();
     return res.status(200).json({
       status: "success",

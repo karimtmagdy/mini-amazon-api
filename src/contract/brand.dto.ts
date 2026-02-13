@@ -8,4 +8,5 @@ export type BrandDto = At & {
   image: Image;
   status: BrandStatus;
   slug?: string;
+  deletedAt?: Date | null;
 };

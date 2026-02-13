@@ -4,8 +4,7 @@ import { catchError } from "../lib/catch.error";
 import type { LoginUser } from "../schemas/user.schema";
 import { BaseCookieOptions, CookieOptions } from "../lib/cookie-options";
 import { getUserAgent } from "../lib/user-agent";
-import type { GlobalResponse } from "../contract/global.dto";
-// import { ApiError } from "../class/api.error";
+import { GlobalResponse } from "../schemas/standred.schema";
 
 /**
  * Design Pattern: MVC Controller

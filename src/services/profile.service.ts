@@ -16,13 +16,13 @@ import fs from "fs";
 export class ProfileService {
   constructor(protected userRepo: UserRepo) {}
   async getHimself(userId: string) {
-    const data = await this.userRepo.findById(userId);
-    if (!data) throw new ApiError("User not found", 404);
-    return { data };
+    const user = await this.userRepo.findById(userId);
+    if (!user) throw new ApiError("User not found", 404);
+    return { user };
   }
   async updateUserHimself(
     userId: string,
-    user: Partial<UpdateUserProfile>,
+    data: Partial<UpdateUserProfile>,
     file?: Express.Multer.File,
   ) {
     if (file) {
@@ -34,37 +34,37 @@ export class ProfileService {
       if (currentUser?.image?.publicId) {
         await cloudService.deletePhoto(currentUser.image.publicId);
       }
-      user.image = { secureUrl, publicId };
+      data.image = { secureUrl, publicId };
       fs.unlinkSync(file.path);
     }
-    const data = await this.userRepo.update(userId, user);
-    if (!data) throw new ApiError("User not found", 404);
-    return { data };
+    const user = await this.userRepo.update(userId, data);
+    if (!user) throw new ApiError("User not found", 404);
+    return { user };
   }
     async deleteImage(userId: string) {
-      const user = await this.userRepo.findById(userId);
-      if (!user) throw new ApiError("User not found", 404);
-      if (user.image?.publicId) {
-        await cloudService.deletePhoto(user.image.publicId);
+      const data = await this.userRepo.findById(userId);
+      if (!data) throw new ApiError("User not found", 404);
+      if (data.image?.publicId) {
+        await cloudService.deletePhoto(data.image.publicId);
       }
-      const data = await this.userRepo.update(userId, { image: null });
-      return { data };
+      const user = await this.userRepo.update(userId, { image: null });
+      return { user };
     }
   async deactivateAccount(userId: string) {
-    const user = await this.userRepo.findById(userId);
-    if (!user) throw new ApiError("User not found", 404);
-    if (user.role === "admin")
+    const data = await this.userRepo.findById(userId);
+    if (!data) throw new ApiError("User not found", 404);
+    if (data.role === "admin")
       throw new ApiError("You cannot deactivate yourself", 400);
-    const data = await this.userRepo.deactivate(userId);
-    return { data };
+    const user = await this.userRepo.deactivate(userId);
+    return { user };
   }
   async deleteHimself(userId: string) {
-    const user = await this.userRepo.findById(userId);
-    if (!user) throw new ApiError("User not found", 404);
-    if (user.role === "admin")
+    const data = await this.userRepo.findById(userId);
+    if (!data) throw new ApiError("User not found", 404);
+    if (data.role === "admin")
       throw new ApiError("You cannot delete yourself", 400);
-    const data = await this.userRepo.softDelete(userId);
-    return { data };
+    const user = await this.userRepo.softDelete(userId);
+    return { user };
   }
 }
 

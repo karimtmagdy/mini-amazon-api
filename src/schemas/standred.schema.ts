@@ -11,7 +11,7 @@ export const dateParamSchema = z.object({
   updatedAt: z.iso.datetime(),
   deletedAt: z.iso.datetime(),
 });
-export const idParamSchema = z.object({
+export const idParamZod = z.object({
   params: z.object({
     id: z
       .string({ error: "ID is required" })
@@ -20,7 +20,7 @@ export const idParamSchema = z.object({
 }) satisfies z.ZodType<{ params: { id: string } }>;
 
 export type DateParam = z.infer<typeof dateParamSchema>;
-export type IdParam = z.infer<typeof idParamSchema>["params"];
+export type IdParam = z.infer<typeof idParamZod>["params"];
 export type QueryString = {
   search: string;
   sort: string;
