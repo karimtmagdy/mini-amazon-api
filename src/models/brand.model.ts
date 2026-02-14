@@ -13,7 +13,7 @@ const BrandSchema = new Schema<BrandDto>(
       maxlength: [30, "Name must be at most 30 characters long"],
     },
     image: {
-      secureUrl: { type: String },
+      url: { type: String },
       publicId: { type: String },
     },
     status: { type: String, enum: BRAND_STATUS, default: "active" },
@@ -48,5 +48,11 @@ BrandSchema.pre("findOneAndUpdate", function () {
     doc.slug = slugify(doc.name, { lower: true, strict: true });
   }
 });
-
+BrandSchema.index({ name: "text" });
+// BrandSchema.pre("find", function () {
+//   this.where({ deletedAt: null });
+// });
+// BrandSchema.pre("findOne", function () {
+//   this.where({ deletedAt: null });
+// });
 export const Brand = model<BrandDto>("Brand", BrandSchema);

@@ -1,8 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
-import { Types } from "mongoose";
 import { z } from "zod";
 import { logger } from "../lib/logger";
-import { ApiError } from "../class/api.error";
 
 export const validate =
   <T extends z.ZodTypeAny>(
@@ -33,11 +31,12 @@ export const validate =
       next(error);
     }
   };
-export function InValidID(id: string | Types.ObjectId) {
-  if (!Types.ObjectId.isValid(id)) {
-    throw new ApiError(`invalid-${String(id)}`, 400);
-  }
-}
-export const IdParamSchema: z.ZodObject = z.object({
-  id: z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid ObjectId"),
-});
+
+export const idParamZod = z.object({
+  params: z.object({
+    id: z
+      .string({ error: "ID is required" })
+      .regex(/^[0-9a-fA-F]{24}$/, "Invalid ID"),
+  }),
+}) satisfies z.ZodType<{ params: { id: string } }>;
+export type IdParam = z.infer<typeof idParamZod>["params"];

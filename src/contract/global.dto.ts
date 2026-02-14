@@ -6,7 +6,7 @@ export type At = {
   deletedAt?: Date | null;
 };
 export type Image = {
-  secureUrl: string;
+  url: string;
   publicId: string | null;
 };
 export const DEFAULT_USER_IMAGE =

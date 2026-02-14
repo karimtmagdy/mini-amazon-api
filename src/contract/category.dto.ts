@@ -9,8 +9,8 @@ export enum CategoryStatusEnum {
 export type CategoryDto = At & {
   name: string;
   description: string;
-  image?: Image;
-  slug?: string;
-  status?: CategoryStatus;
-  deletedAt?: Date | null;
+  image: Image;
+  slug: string;
+  status: CategoryStatus;
+  deletedAt: Date | null;
 };

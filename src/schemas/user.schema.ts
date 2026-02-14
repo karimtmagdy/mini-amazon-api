@@ -1,9 +1,9 @@
 import * as z from "zod/v4";
 import {
-  type UserDto,
   USER_GENDERS,
   USER_ROLES,
   USER_ACCOUNT_STATUS,
+  USER_STATE,
 } from "../contract/user.dto";
 export const emailRegex: RegExp =
   /^[a-zA-Z0-9._%+-]+@(gmail|yahoo|outlook|hotmail)\.(com|net|org)$/;
@@ -12,7 +12,7 @@ export const defaultUserZod = z
   .object({
     body: z.object({
       username: z
-        .string()
+        .string({ message: "Username is required" })
         .min(3, "Username must be at least 3 characters")
         .max(50, "Username must be less than 50 characters")
         .transform((username) => username.trim()),
@@ -28,18 +28,18 @@ export const defaultUserZod = z
         .max(30, { message: "Password must be at most 30 characters" }),
       gender: z.enum(USER_GENDERS).optional(),
       age: z
-        .number()
+        .number({ message: "Age is required" })
         .int()
         .refine((age) => age >= 18, "You must be 18 or older")
         .optional(),
       name: z
         .object({
           first: z
-            .string()
+            .string({ message: "First name is required" })
             .min(3, "First name must be at least 3 characters")
             .max(20, "First name must be less than 20 characters"),
           last: z
-            .string()
+            .string({ message: "Last name is required" })
             .min(3, "Last name must be at least 3 characters")
             .max(20, "Last name must be less than 20 characters"),
         })
@@ -48,13 +48,11 @@ export const defaultUserZod = z
           last: name.last.trim(),
         }))
         .optional(),
-      image: z
-        .object({
-          secureUrl: z.string(),
-          publicId: z.string(),
-        })
-        .optional(),
+      image: z.object({ url: z.string(), publicId: z.string() }).optional(),
       role: z.enum(USER_ROLES).default("user"),
+      status: z.enum(USER_ACCOUNT_STATUS).default("active"),
+      state: z.enum(USER_STATE).default("offline"),
+      slug: z.string().readonly(),
     }),
   })
   .strict();

@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import {
   appSettingsService,
   AppSettingsService,
-} from "../services/app-settings.service";
+} from "../services/app.service";
 import { catchError } from "../lib/catch.error";
 
 /**

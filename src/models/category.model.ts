@@ -12,10 +12,7 @@ const CategorySchema = new Schema<CategoryDto>(
       minlength: [3, "Category name must be at least 3 characters long"],
       maxlength: [30, "Category name must be at most 30 characters long"],
     },
-    image: {
-      secureUrl: { type: String },
-      publicId: { type: String },
-    },
+    image: { url: { type: String }, publicId: { type: String } },
     description: {
       type: String,
       trim: true,
@@ -60,4 +57,5 @@ CategorySchema.pre("findOneAndUpdate", function () {
     doc.slug = slugify(doc.name, { lower: true, strict: true });
   }
 });
+CategorySchema.index({ name: "text" });
 export const Category = model<CategoryDto>("Category", CategorySchema);

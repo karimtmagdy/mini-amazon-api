@@ -1,6 +1,6 @@
 import { Model, Query, QueryFilter } from "mongoose";
 import { QueryString } from "../schemas/standred.schema";
-import { APIFeaturesResult } from "../schemas/pagination.schema";
+import { APIFeaturesResult } from "../schemas/standred.schema";
 
 class APIFeatures<T> {
   private model: Model<T>;
@@ -59,9 +59,9 @@ class APIFeatures<T> {
     return this;
   }
   paginate(): this {
-    const pageNum = this.QS.page;
+    const pageNum = Number(this.QS.page);
     this.page = pageNum > 0 ? pageNum : 1;
-    const limitNum = this.QS.limit;
+    const limitNum = Number(this.QS.limit);
     this.limit =
       limitNum > 0 ? Math.min(limitNum, this.MAX_LIMIT) : this.DEFAULT_LIMIT;
     this.skip = (this.page - 1) * this.limit;

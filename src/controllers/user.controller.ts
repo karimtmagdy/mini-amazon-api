@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { UserService, userService } from "../services/user.service";
 import { catchError } from "../lib/catch.error";
-import { GlobalResponse } from "../schemas/standred.schema";
+import { GlobalResponse, QueryString } from "../schemas/standred.schema";
 import { UserDto } from "../contract/user.dto";
 import { CreateUser, UpdateUser, UpdateUserRole } from "../schemas/user.schema";
 
@@ -15,85 +15,85 @@ export class UserController {
 
   create = catchError(async (req: Request, res: Response) => {
     const validatedData = req.body as CreateUser;
-    const { data } = await this.userService.createByAdmin(validatedData);
+    const { user } = await this.userService.createByAdmin(validatedData);
     return res.status(200).json({
       status: "success",
-      message: "user has been created successfully",
-      data,
+      message: "user has been created",
+      data: user,
     } satisfies GlobalResponse<UserDto>);
   });
   getOne = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
-    const { data } = await this.userService.getUserById(id);
+    const { user } = await this.userService.getUserById(id);
     return res.status(200).json({
       status: "success",
-      message: "user retrieved successfully",
-      data,
+      data: user,
     } satisfies GlobalResponse<UserDto>);
   });
   getAll = catchError(async (req: Request, res: Response) => {
-    const { data } = await this.userService.getAll();
+    const queryData = req.query as unknown as QueryString;
+    const { users } = await this.userService.getAll(queryData);
     return res.status(200).json({
       status: "success",
-      message: "users retrieved successfully",
-      data: data as UserDto[],
+      data: users.data,
+      meta: users.pagination,
     } satisfies GlobalResponse<UserDto[]>);
   });
   changeRoleByAdmin = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
     const validatedData = req.body as UpdateUserRole;
-    const { data } = await this.userService.changeRole(id, validatedData);
+    const { user } = await this.userService.changeRole(id, validatedData);
     return res.status(200).json({
       status: "success",
       message: `user role has been changed to ${validatedData}`,
-      data: data as UserDto,
+      data: user as UserDto,
     } satisfies GlobalResponse<UserDto>);
   });
   updateUserByAdmin = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
     const validatedData = req.body as UpdateUser;
-    const { data } = await this.userService.update(id, validatedData);
+    const { user } = await this.userService.update(id, validatedData);
     return res.status(200).json({
       status: "success",
       message: "user has been updated",
-      data: data as UserDto,
+      data: user as UserDto,
     } satisfies GlobalResponse<UserDto>);
   });
   deleteSoftByAdmin = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
-    const { data } = await this.userService.softDeleteByAdmin(id);
+    const { user } = await this.userService.softDeleteByAdmin(id);
     return res.status(200).json({
       status: "success",
       message: "user has been moved to trash",
-      data: data as UserDto,
+      data: user as UserDto,
     } satisfies GlobalResponse<UserDto>);
   });
   unlockByAdmin = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
-    const { data } = await this.userService.unlockByAdmin(id);
+    const { user } = await this.userService.unlockByAdmin(id);
     return res.status(200).json({
       status: "success",
       message: "user has been unlocked",
-      data: data as UserDto,
+      data: user as UserDto,
     } satisfies GlobalResponse<UserDto>);
   });
   deactivateByAdmin = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
-    const { data } = await this.userService.deactivateByAdmin(id);
+    const { user } = await this.userService.deactivateByAdmin(id);
     return res.status(200).json({
       status: "success",
       message: "user has been deactivated",
-      data: data as UserDto,
+      data: user as UserDto,
     } satisfies GlobalResponse<UserDto>);
   });
   updateStatusByAdmin = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
-    const validatedData = req.body //as UpdateUserStatus;
-    const { data } = await this.userService.updateStatus(id, validatedData);
+    const validatedData = req.body; //as UpdateUserStatus;
+    const { user } = await this.userService.updateStatus(id, validatedData);
     return res.status(200).json({
       status: "success",
       message: "user status has been updated",
-      data: data as UserDto,
+      data: user as UserDto,
     } satisfies GlobalResponse<UserDto>);
   });
   // reactivateByAdmin = catchError(async (req: Request, res: Response) => {
@@ -107,11 +107,11 @@ export class UserController {
   // });
   deleteBulk = catchError(async (req: Request, res: Response) => {
     const { ids } = req.body as { ids: string[] };
-    const { data } = await this.userService.deleteBulk(ids);
+    const { users } = await this.userService.deleteBulk(ids);
     return res.status(200).json({
       status: "success",
-      message: `${data.modifiedCount} users have been deleted`,
-      data,
+      message: `${users.modifiedCount} users have been deleted`,
+      data: users,
     } satisfies GlobalResponse<{ modifiedCount: number }>);
   });
 }

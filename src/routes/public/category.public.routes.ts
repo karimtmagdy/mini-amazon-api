@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { categoryController } from "../../controllers/category.controller";
-import { validate } from "../../middlewares/validate";
-import { idParamZod } from "../../schemas/standred.schema";
+import { idParamZod, validate } from "../../middlewares/validate";
 
 const router = Router();
 

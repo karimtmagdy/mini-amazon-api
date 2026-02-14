@@ -1,6 +1,8 @@
 import { User } from "../models/user.model";
 // import type { UserDto } from "../contract/user.dto";
 import { DEFAULT_USER_IMAGE } from "../contract/global.dto";
+import { QueryString } from "../schemas/standred.schema";
+import { APIFeatures } from "../class/api.feature";
 // import { CreateUser } from "../schemas/user.schema";
 
 /**
@@ -18,8 +20,16 @@ export class UserRepo {
   async findById(id: string) {
     return await User.findById(id);
   }
-  async findAll() {
-    return await User.find({}).select("+password").exec();
+  async findAll(query: QueryString) {
+    const features = new APIFeatures(User, query);
+    const users = await features
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate()
+      .search(["username", "email"])
+      .execute();
+    return users;
   }
   async create(user: any) {
     return await User.create(user);

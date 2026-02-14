@@ -1,12 +1,9 @@
 import { Router } from "express";
 import { userController } from "../../controllers/user.controller";
 import { authenticated, checkPermission } from "../../middlewares/authroized";
-import { validate } from "../../middlewares/validate";
+import { idParamZod, validate } from "../../middlewares/validate";
 import { changeRoleZod, createUserZod } from "../../schemas/user.schema";
-import {
-  idParamZod,
-  multipleBulkDeleteSchema,
-} from "../../schemas/standred.schema";
+import { multipleBulkDeleteZod } from "../../schemas/standred.schema";
 
 const router = Router();
 router.use(authenticated, checkPermission(["admin"]));
@@ -51,7 +48,7 @@ router.patch(
 router.delete(
   "/bulk",
   checkPermission(["admin"]),
-  validate(multipleBulkDeleteSchema),
+  validate(multipleBulkDeleteZod),
   userController.deleteBulk,
 );
 export default {

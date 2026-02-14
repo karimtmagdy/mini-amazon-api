@@ -1,29 +1,26 @@
 import { Router } from "express";
-import { categoryController } from "../../controllers/category.controller";
+import { brandController } from "../../controllers/brand.controller";
 import { idParamZod, validate } from "../../middlewares/validate";
-import {
-  createCategoryZod,
-  updateCategoryZod,
-} from "../../schemas/category.schema";
+import { createBrandZod, updateBrandZod } from "../../schemas/brand.schema";
 import { authenticated, checkPermission } from "../../middlewares/authroized";
 const router = Router();
 
 router.use(authenticated, checkPermission(["admin", "manager"]));
-router.post("/", validate(createCategoryZod), categoryController.create);
+router.post("/", validate(createBrandZod), brandController.create);
 router.patch(
   "/:id",
   validate(idParamZod),
-  validate(updateCategoryZod),
-  categoryController.update,
+  validate(updateBrandZod),
+  brandController.update,
 );
 router.delete(
   "/:id",
   checkPermission(["admin"]),
   validate(idParamZod),
-  categoryController.softDelete,
+  brandController.softDelete,
 );
 
 export default {
-  path: "/categories",
+  path: "/brands",
   router,
 };

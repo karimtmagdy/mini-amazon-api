@@ -31,29 +31,28 @@ export type UserRole = (typeof USER_ROLES)[number];
 
 export type UserDto = At & {
   id: string;
-  // id: string | ObjectId;
   username: string;
-  slug?: string;
+  slug: string;
   email: string;
   password: string;
   comparePassword(candidatePassword: string): Promise<boolean>;
-  name?: {
+  name: {
     first: string;
     last: string;
   };
-  age?: number;
-  gender?: UserGender;
-  image?: Image;
+  age: number;
+  gender: UserGender;
+  image: Image;
   role: UserRole;
   status: UserAccountStatus;
   state: UserState;
   //   verified?: boolean;
   //   verifiedAt?: Date;
   //   remember?: boolean;
-  activeAt?: Date;
-  logoutAt?: Date;
-  lockedUntil?: Date;
-  failedLoginAttempts?: number;
+  activeAt: Date;
+  logoutAt: Date;
+  lockedUntil: Date;
+  failedLoginAttempts: number;
   //   cart?: {
   //     type?: string;
   //     productId: string;

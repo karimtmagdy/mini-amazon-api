@@ -4,11 +4,7 @@ import { z } from "zod";
 import { Error as MongooseError } from "mongoose";
 import { ApiError } from "../class/api.error";
 
-const ErrorResponseSchema = z.object({
-  code: z.number(),
-  message: z.string(),
-  stack: z.any(),
-});
+
 
 export function errorHandler(
   err: any,
@@ -19,20 +15,6 @@ export function errorHandler(
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal Server Error";
 
-  const errorResponse = ErrorResponseSchema.safeParse({
-    code: statusCode,
-    message,
-    stack: env.nodeEnv === "development" ? err.stack : {},
-  });
-
-  if (!errorResponse.success) {
-    res.status(500).json({
-      code: 500,
-      message: "Internal Server Error",
-      stack: env.nodeEnv === "development" ? err.stack : {},
-    });
-    return;
-  }
   // 2. Mongoose Cast Error (Invalid ID, etc.)
   if (err instanceof MongooseError.CastError || err.name === "CastError") {
     return res.status(400).json({
@@ -42,7 +24,7 @@ export function errorHandler(
   }
 
   // 3. Known App Error
-  if (err instanceof ApiError || err.isOperational) {
+  if (err instanceof ApiError || (err as any).isOperational) {
     return res.status((err as any).statusCode || 500).json({
       status: "fail",
       message: err.message,
@@ -62,24 +44,12 @@ export function errorHandler(
 
   // 5. Zod Validation Error
   if (err instanceof z.ZodError || err.name === "ZodError") {
-    // const issues = err.issues || [];
-    // const firstIssue = issues[0];
-
-    // const formatPath = (path: (string | number | symbol)[]) => {
-    //   if (
-    //     path.length > 1 &&
-    //     ["body", "query", "params", "cookies"].includes(String(path[0]))
-    //   ) {
-    //     return path.slice(1).join(".");
-    //   }
-    //   return path.join(".") || "field";
-    // };
     const issues = err.issues || [];
-    const mainIssue = issues[0].message;
     const formattedErrors = issues.map((issue: z.ZodIssue) => ({
       field: issue.path.join("."),
       message: issue.message,
     }));
+    const mainIssue = issues[0]?.message || "Validation Error";
 
     return res.status(400).json({
       status: "fail",
@@ -89,5 +59,9 @@ export function errorHandler(
   }
 
   // Final fallback (if no specific error matched)
-  return res.status(statusCode).json(errorResponse.data);
+  return res.status(statusCode).json({
+    code: statusCode,
+    message,
+    stack: env.nodeEnv === "development" ? err.stack : undefined,
+  });
 }

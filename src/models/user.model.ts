@@ -25,7 +25,7 @@ const UserSchema = new Schema<UserDto>(
       lowercase: true,
       trim: true,
       unique: true,
-      required: true,
+      required: [true, "Email is required"],
       immutable: true,
     },
     password: {
@@ -61,7 +61,7 @@ const UserSchema = new Schema<UserDto>(
     //   maxlength: [15, "Phone number must be at most 15 characters"],
     // },
     image: {
-      secureUrl: {
+      url: {
         type: String,
         trim: true,
         default: DEFAULT_USER_IMAGE,
@@ -133,4 +133,5 @@ UserSchema.pre("findOneAndUpdate", function () {
     doc.slug = slugify(doc.username, { lower: true, strict: true });
   }
 });
+UserSchema.index({ username: "text", email: "text" });
 export const User = model<UserDto>("User", UserSchema);

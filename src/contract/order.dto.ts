@@ -22,7 +22,7 @@ export type OrderItemDto = {
 }
 
 export type OrderDto = At & {
-  _id: Types.ObjectId;
+  id: Types.ObjectId;
   user: Types.ObjectId;
   orderItems: OrderItemDto[];
   shippingAddress: {

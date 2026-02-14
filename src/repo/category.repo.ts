@@ -1,6 +1,8 @@
 import { UpdateQuery } from "mongoose";
 import { CategoryDto, CategoryStatusEnum } from "../contract/category.dto";
 import { Category } from "../models/category.model";
+import { QueryString } from "../schemas/standred.schema";
+import { APIFeatures } from "../class/api.feature";
 
 export class CategoryRepo {
   async create(data: CategoryDto) {
@@ -26,14 +28,16 @@ export class CategoryRepo {
     const category = await Category.findById(id).lean();
     return category;
   }
-  async findAll() {
-    const categories = await Category.find({
-      status: CategoryStatusEnum.ACTIVE,
-    })
-      .sort({ createdAt: -1 })
-      .skip(0)
-      .limit(10)
-      .lean();
+  async findAll(query: QueryString) {
+    const features = new APIFeatures(Category, query);
+    const categories = await features
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate()
+      .search(["name"])
+      .execute();
+
     return categories;
   }
 }

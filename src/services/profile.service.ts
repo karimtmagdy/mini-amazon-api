@@ -1,11 +1,6 @@
-// import { UserDto } from "../contract/user.dto";
 import { ApiError } from "../class/api.error";
 import { UserRepo, userRepo } from "../repo/user.repo";
-import {
-  CreateUser,
-  UpdateUser,
-  UpdateUserProfile,
-} from "../schemas/user.schema";
+import { UpdateUserProfile } from "../schemas/user.schema";
 import { cloudService } from "../config/cloudinary";
 import fs from "fs";
 /**
@@ -26,7 +21,7 @@ export class ProfileService {
     file?: Express.Multer.File,
   ) {
     if (file) {
-      const { secureUrl, publicId } = await cloudService.uploadSinglePhoto(
+      const { url, publicId } = await cloudService.uploadSinglePhoto(
         file.path,
         "users",
       );
@@ -34,22 +29,22 @@ export class ProfileService {
       if (currentUser?.image?.publicId) {
         await cloudService.deletePhoto(currentUser.image.publicId);
       }
-      data.image = { secureUrl, publicId };
+      data.image = { url, publicId };
       fs.unlinkSync(file.path);
     }
     const user = await this.userRepo.update(userId, data);
     if (!user) throw new ApiError("User not found", 404);
     return { user };
   }
-    async deleteImage(userId: string) {
-      const data = await this.userRepo.findById(userId);
-      if (!data) throw new ApiError("User not found", 404);
-      if (data.image?.publicId) {
-        await cloudService.deletePhoto(data.image.publicId);
-      }
-      const user = await this.userRepo.update(userId, { image: null });
-      return { user };
+  async deleteImage(userId: string) {
+    const data = await this.userRepo.findById(userId);
+    if (!data) throw new ApiError("User not found", 404);
+    if (data.image?.publicId) {
+      await cloudService.deletePhoto(data.image.publicId);
     }
+    const user = await this.userRepo.update(userId, { image: null });
+    return { user };
+  }
   async deactivateAccount(userId: string) {
     const data = await this.userRepo.findById(userId);
     if (!data) throw new ApiError("User not found", 404);

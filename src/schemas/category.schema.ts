@@ -19,9 +19,7 @@ export const categoryZod = z
           message: "Category description must be at most 100 characters long",
         }),
       status: z.enum(CATEGORY_STATUS).default("active"),
-      image: z
-        .object({ secureUrl: z.string(), publicId: z.string() })
-        .optional(),
+      image: z.object({ url: z.string(), publicId: z.string() }).optional(),
       slug: z.string().readonly(),
     }),
   })
@@ -30,8 +28,6 @@ export const categoryZod = z
 export const createCategoryZod = z
   .object({
     body: categoryZod.shape.body.omit({
-      status: true,
-      image: true,
       slug: true,
     }),
   })
