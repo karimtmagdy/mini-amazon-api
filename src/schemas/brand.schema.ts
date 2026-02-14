@@ -1,5 +1,5 @@
-import { z } from "zod";
-import { CATEGORY_STATUS } from "../contract/category.dto";
+import { z } from "zod/v4";
+import { BRAND_STATUS } from "../contract/brand.dto";
 
 export const brandZod = z
   .object({
@@ -10,7 +10,7 @@ export const brandZod = z
         .max(30, {
           message: "Brand name must be at most 30 characters long",
         }),
-      status: z.enum(CATEGORY_STATUS).default("active"),
+      status: z.enum(BRAND_STATUS).default("active").readonly(),
       image: z.object({ url: z.string(), publicId: z.string() }).optional(),
       slug: z.string().readonly(),
     }),

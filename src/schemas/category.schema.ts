@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { CATEGORY_STATUS } from "../contract/category.dto";
 
 export const categoryZod = z

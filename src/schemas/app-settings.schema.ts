@@ -1,5 +1,5 @@
 // import { AppSettingsDto } from "../contract/app-settings.dto";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const updateAppSettingsSchema = z.object({
   body: z.object({
