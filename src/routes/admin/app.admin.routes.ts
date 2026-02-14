@@ -6,17 +6,15 @@ import { authenticated, checkPermission } from "../../middlewares/authroized";
 
 const router = Router();
 
-// Public route to get settings
-router.get("/", appSettingsController.getSettings);
-
-// Admin route to update settings
-router.patch(
-  "/",
-  authenticated,
-  checkPermission(["admin"]),
-  validate(updateAppSettingsSchema),
-  appSettingsController.updateSettings,
-);
+router
+  .route("/")
+  .get(appSettingsController.getSettings)
+  .patch(
+    authenticated,
+    checkPermission(["admin"]),
+    validate(updateAppSettingsSchema),
+    appSettingsController.updateSettings,
+  );
 
 export default {
   path: "/app-settings",

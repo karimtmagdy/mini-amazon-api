@@ -20,9 +20,6 @@ router.route("/sales").get((req, res) => {
 router.route("/users").get((req, res) => {
   res.json({ message: "Admin users" });
 });
-router.route("/users-activity").get((req, res) => {
-  res.json({ message: "Admin users activity" });
-});
 
 export default {
   path: "/stats",

@@ -7,18 +7,14 @@ const router = Router();
 
 router.use(authenticated, checkPermission(["admin", "manager"]));
 router.post("/", validate(createBrandZod), brandController.create);
-router.patch(
-  "/:id",
-  validate(idParamZod),
-  validate(updateBrandZod),
-  brandController.update,
-);
-router.delete(
-  "/:id",
-  checkPermission(["admin"]),
-  validate(idParamZod),
-  brandController.softDelete,
-);
+router
+  .route("/:id")
+  .patch(validate(idParamZod), validate(updateBrandZod), brandController.update)
+  .delete(
+    checkPermission(["admin"]),
+    validate(idParamZod),
+    brandController.softDelete,
+  );
 
 export default {
   path: "/brands",

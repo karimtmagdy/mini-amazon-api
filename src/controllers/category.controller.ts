@@ -55,8 +55,8 @@ export class CategoryController {
     const { categories } = await this.categoryService.findAll(queryData);
     res.status(200).json({
       status: "success",
-      data: categories.data,
       meta: categories.pagination,
+      data: categories.data,
     } satisfies GlobalResponse<CategoryDto[]>);
   });
 }

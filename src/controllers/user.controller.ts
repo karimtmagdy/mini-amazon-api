@@ -35,8 +35,8 @@ export class UserController {
     const { users } = await this.userService.getAll(queryData);
     return res.status(200).json({
       status: "success",
-      data: users.data,
       meta: users.pagination,
+      data: users.data,
     } satisfies GlobalResponse<UserDto[]>);
   });
   changeRoleByAdmin = catchError(async (req: Request, res: Response) => {

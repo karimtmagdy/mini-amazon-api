@@ -52,8 +52,8 @@ export class BrandController {
     const { brands } = await this.brandService.findAll(queryData);
     res.status(200).json({
       status: "success",
-      data: brands.data,
       meta: brands.pagination,
+      data: brands.data,
     } satisfies GlobalResponse<BrandDto[]>);
   });
 }
