@@ -31,9 +31,11 @@ export const deactivateUserSchema = z.object({
 }) satisfies z.ZodType<{ body: { password: string } }>;
 export const refreshTokenSchema = z.object({
   cookies: z.object({
-    refreshToken: z.string({
-      message: "Refresh token is missing",
-    }),
+    refreshToken: z
+      .string({
+        message: "Refresh token is missing",
+      })
+      .min(1, "Refresh token cannot be empty"),
   }),
 });
 export type ChangePassword = z.infer<typeof changePasswordSchema>["body"];

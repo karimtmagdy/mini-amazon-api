@@ -223,7 +223,7 @@ export class AuthService {
       id: user.id,
       email: user.email,
       username: user.username,
-      role: user.role,
+      role: user.role ?? "user",
     };
     const accessToken = jwtUitl.generateAccessToken(newTokenPayload);
     const newRefreshToken = jwtUitl.generateRefreshToken({ id: user.id });
