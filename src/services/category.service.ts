@@ -18,6 +18,7 @@ export class CategoryService {
       image: data.image || defaultImage,
       status: data.status || "active",
       description: data.description,
+      productsCount: 0,
       deletedAt: null,
     };
 
@@ -72,6 +73,10 @@ export class CategoryService {
   async findAll(query: QueryString) {
     const categories = await this.categoryRepo.findAll(query);
     return { categories };
+  }
+  async getStats() {
+    const stats = await this.categoryRepo.getCategoryStats();
+    return { stats };
   }
 }
 export const categoryService = new CategoryService(categoryRepo);

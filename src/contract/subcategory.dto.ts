@@ -5,5 +5,6 @@ export type SubCategoryDto = {
   slug: string;
   description?: string;
   category: (Types.ObjectId | string)[];
+  productsCount: number;
   deletedAt?: Date | null;
 }

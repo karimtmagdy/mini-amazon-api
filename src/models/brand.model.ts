@@ -18,6 +18,7 @@ const BrandSchema = new Schema<BrandDto>(
     },
     status: { type: String, enum: BRAND_STATUS, default: "active" },
     slug: { type: String, trim: true },
+    productsCount: { type: Number, default: 0 },
     deletedAt: { type: Date, default: null },
   },
   {

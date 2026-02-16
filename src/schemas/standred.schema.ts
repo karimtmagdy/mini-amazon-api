@@ -13,6 +13,7 @@ export interface APIFeaturesResult<T> {
   data: T[];
   pagination: Pagination;
 }
+export const mongoIdRegex = /^[0-9a-fA-F]{24}$/;
 
 export const emailRegex: RegExp =
   /^[a-zA-Z0-9._%+-]+@(gmail|yahoo|outlook|hotmail)\.(com|net|org)$/;

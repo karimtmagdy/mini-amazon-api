@@ -59,6 +59,13 @@ export class CategoryController {
       data: categories.data,
     } satisfies GlobalResponse<CategoryDto[]>);
   });
+  getStats = catchError(async (req: Request, res: Response) => {
+    const { stats } = await this.categoryService.getStats();
+    res.status(200).json({
+      status: "success",
+      data: stats,
+    } satisfies GlobalResponse<any>);
+  });
 }
 
 export const categoryController = new CategoryController(categoryService);

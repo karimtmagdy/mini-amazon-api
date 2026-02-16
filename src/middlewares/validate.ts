@@ -39,4 +39,4 @@ export const idParamZod = z.object({
       .regex(/^[0-9a-fA-F]{24}$/, "Invalid ID"),
   }),
 }) satisfies z.ZodType<{ params: { id: string } }>;
-export type IdParam = z.infer<typeof idParamZod>["params"];
+export type IdParam = z.infer<typeof idParamZod>["params"]["id"];

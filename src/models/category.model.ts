@@ -28,6 +28,7 @@ const CategorySchema = new Schema<CategoryDto>(
     slug: { type: String, trim: true },
     status: { type: String, enum: CATEGORY_STATUS, default: "active" },
     deletedAt: { type: Date, default: null },
+    productsCount: { type: Number, default: 0 },
   },
   {
     timestamps: true,
@@ -46,15 +47,14 @@ const CategorySchema = new Schema<CategoryDto>(
   },
 );
 CategorySchema.pre("save", function () {
-  const doc = this as unknown as CategoryDto;
-  if (doc.name) {
-    doc.slug = slugify(doc.name, { lower: true, strict: true });
+  if (this.isModified("name")) {
+    this.slug = slugify(this.name, { lower: true, strict: true });
   }
 });
 CategorySchema.pre("findOneAndUpdate", function () {
-  const doc = this.getUpdate() as Partial<CategoryDto>;
-  if (doc && doc.name) {
-    doc.slug = slugify(doc.name, { lower: true, strict: true });
+  const update = this.getUpdate() as any;
+  if (update && update.name) {
+    update.slug = slugify(update.name, { lower: true, strict: true });
   }
 });
 CategorySchema.index({ name: "text" });

@@ -9,6 +9,7 @@ import { authenticated, checkPermission } from "../../middlewares/authroized";
 const router = Router();
 
 router.use(authenticated, checkPermission(["admin", "manager"]));
+router.get("/stats", categoryController.getStats);
 router.post("/", validate(createCategoryZod), categoryController.create);
 router
   .route("/:id")

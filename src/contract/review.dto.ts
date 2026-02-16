@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { At } from "./global.dto";
 
 export const REVIEW_STATUS = ["pending", "completed", "failed"] as const;
@@ -6,8 +7,8 @@ export type ReviewStatus = (typeof REVIEW_STATUS)[number];
 export type ReviewDto = At & {
   comment: string;
   ratings: number;
-//   user: Types.ObjectId;
-//   product: Types.ObjectId;
+  user: Types.ObjectId;
+  product: Types.ObjectId;
 };
 export type CreateReviewInput = {
   comment: string;
