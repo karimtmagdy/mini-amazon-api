@@ -19,6 +19,7 @@ void (async () => {
     await Database.getInstance();
   } catch (error) {
     logger.error("🔥 Failed to start server:", error);
+    
   }
 })();
 process.on("uncaughtException", (error) => {
