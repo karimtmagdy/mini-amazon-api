@@ -13,21 +13,15 @@ export const corsOption = () => {
         callback(new ApiError("Not allowed by CORS", 403));
       }
     },
-    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+    methods: ["GET", "PUT", "PATCH", "POST", "DELETE"],
     allowedHeaders: [
       "Content-Type",
       "Authorization",
-      "Access-Control-Allow-Origin",
-      // "Accept-Version",
-      // "Accept",
-      // "Access-Control-Allow-Methods",
-      // "Access-Control-Allow-Headers",
-      "Access-Control-Allow-Credentials",
+      "X-Requested-With",
+      "Accept",
     ],
     credentials: true,
     preflightContinue: false,
-    // maxAge: 86400, // 24 hours
     optionsSuccessStatus: 204,
-    // exposedHeaders: ["Set-Cookie"],
   });
 };
