@@ -21,13 +21,16 @@ export class SubCategoryRepo {
     return category;
   }
   async findById(id: string) {
-    const subCategory = await SubCategory.findById(id).lean();
+    const subCategory = await SubCategory.findById(id)
+      .populate("category", "name")
+      .lean();
     return subCategory;
   }
   async findAll(query: QueryString) {
     const features = new APIFeatures(SubCategory, query);
     const subCategories = await features
       .filter()
+      .populate({ path: "category", select: "name" })
       .sort()
       .limitFields()
       .paginate()

@@ -83,6 +83,10 @@ class APIFeatures<T> {
     }
     return this;
   }
+  populate(fields: any): this {
+    this.query = this.query.populate(fields);
+    return this;
+  }
   async execute(): Promise<APIFeaturesResult<T>> {
     const total = await this.model.countDocuments(
       this.query.getFilter() as QueryFilter<T>,

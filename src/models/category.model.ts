@@ -28,7 +28,7 @@ const CategorySchema = new Schema<CategoryDto>(
     slug: { type: String, trim: true },
     status: { type: String, enum: CATEGORY_STATUS, default: "active" },
     deletedAt: { type: Date, default: null },
-    productsCount: { type: Number, default: 0 },
+    products: { type: Number, default: 0 },
   },
   {
     timestamps: true,
