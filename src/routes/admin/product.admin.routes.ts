@@ -1,26 +1,22 @@
-// import { Router } from "express";
-// import { productController } from "@/controllers/product.controller";
-// import { validate } from "@/middleware/validate";
-// import {
-//   createProductSchema,
-//   updateProductSchema,
-//   updateStockSchema,
-// } from "@/schema/product.schema";
-// import { authenticate, authorize } from "@/middleware/auth.middleware";
+import { Router } from "express";
+import { productController } from "../../controllers/product.controller";
+import { validate } from "../../middlewares/validate";
+import {
+  createProductZod,
+  //   updateProductSchema,
+  //   updateStockSchema,
+} from "../../schema/product.schema";
+import { authenticated, checkPermission } from "../../middlewares/authroized";
 // import {
 //   idParamSchema,
 //   multipleBulkDeleteSchema,
 // } from "@/schema/global.schema";
 
-// const router = Router();
+const router = Router();
 
-// router.use(authenticate, authorize(["admin", "manager"]));
+router.use(authenticated, checkPermission(["admin", "manager"]));
 
-// router.post(
-//   "/",
-//   validate(createProductSchema),
-//   productController.createProduct.bind(productController)
-// );
+router.post("/", validate(createProductZod), productController.create);
 
 // router.get(
 //   "/inactive",
