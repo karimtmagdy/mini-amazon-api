@@ -65,8 +65,8 @@ export const defaultProductZod = z
 
 export const createProductZod = defaultProductZod.shape.body
   .clone()
-  .strict()
-  .required();
+  .strict();
+  // .required();
 export const updateProductZod = defaultProductZod.shape.body.partial().strict();
 export const updateStockZod = defaultProductZod.shape.body
   .pick({
