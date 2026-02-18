@@ -31,6 +31,7 @@ export class SubCategoryRepo {
     const subCategories = await features
       .filter()
       .populate({ path: "category", select: "name" })
+      .populate("products")
       .sort()
       .limitFields()
       .paginate()

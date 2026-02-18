@@ -20,7 +20,7 @@ const SubCategorySchema = new Schema<SubCategoryDto>(
       maxlength: [500, "Description must be at most 500 characters"],
     },
     category: [{ type: Types.ObjectId, ref: "Category", required: true }],
-    products: { type: Number, default: 0 },
+    // products: { type: Number, default: 0 },
     deletedAt: { type: Date, default: null },
   },
   {
@@ -52,7 +52,13 @@ SubCategorySchema.pre("findOneAndUpdate", function () {
     update.slug = slugify(update.name, { lower: true, strict: true });
   }
 });
-
+// إضافة virtual لحساب عدد المنتجات من موديل الـ Product
+SubCategorySchema.virtual('products', {
+  ref: 'Product', // اسم موديل المنتجات
+  localField: 'id',
+  foreignField: 'subcategory', // الحقل اللي في منتج ومربوط بالساب كايتجوري
+  count: true // يرجع العدد فقط مش الـ objects كاملة
+});
 export const SubCategory = model<SubCategoryDto>(
   "SubCategory",
   SubCategorySchema,
