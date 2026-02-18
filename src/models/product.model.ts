@@ -15,8 +15,8 @@ const ProductSchema = new Schema<ProductDto>(
       minlength: 3,
       maxlength: 100,
     },
-    description: { type: String, trim: true, minlength: 10, maxlength: 1000 },
-    price: { type: Number, required: true, trim: true, min: 0, max: 1_000_000 },
+    // description: { type: String, trim: true, minlength: 10, maxlength: 1000 },
+    // price: { type: Number, required: true, trim: true, min: 0, max: 1_000_000 },
     stock: { type: Number, default: 0, required: true },
     sold: { type: Number, default: 0 },
     status: { type: String, enum: PRODUCT_STATUS, default: "active" },
@@ -28,43 +28,43 @@ const ProductSchema = new Schema<ProductDto>(
       publicId: { type: String, default: "" },
     },
     sku: { type: String, unique: true, sparse: true },
-    discount: { type: Number, default: 0, min: 0, max: 100 },
-    PriceAfterDiscount: { type: Number, default: 0 },
-    slug: { type: String, trim: true, unique: true },
-    images: {
-      type: [
-        {
-          url: String,
-          publicId: String,
-        },
-      ],
-      validate: [
-        (val: any[]) => val.length <= 5,
-        "{PATH} exceeds the limit of 5",
-      ],
-    },
+    // discount: { type: Number, default: 0, min: 0, max: 100 },
+    // PriceAfterDiscount: { type: Number, default: 0 },
+    // slug: { type: String, trim: true, unique: true },
+    // images: {
+    //   type: [
+    //     {
+    //       url: String,
+    //       publicId: String,
+    //     },
+    //   ],
+    //   validate: [
+    //     (val: any[]) => val.length <= 5,
+    //     "{PATH} exceeds the limit of 5",
+    //   ],
+    // },
     brand: { type: Schema.Types.ObjectId, ref: "Brand", required: false },
     category: [{ type: Schema.Types.ObjectId, ref: "Category" }],
     subcategory: [{ type: Schema.Types.ObjectId, ref: "SubCategory" }],
-    ratingsAverage: {
-      type: Number,
-      default: 0,
-      min: [0, "Rating must be at least 0"],
-      max: [5, "Rating cannot be more than 5"],
-      set: (val: number) => Math.round(val * 10) / 10,
-    },
-    ratingsCount: { type: Number, default: 0 },
-    colors: [String],
-    tags: {
-      type: [String],
-      default: [],
-      validate: {
-        validator: function (tags: string[]) {
-          return tags.length <= 10;
-        },
-        message: "Tags cannot exceed 10 items",
-      },
-    },
+    // ratingsAverage: {
+    //   type: Number,
+    //   default: 0,
+    //   min: [0, "Rating must be at least 0"],
+    //   max: [5, "Rating cannot be more than 5"],
+    //   set: (val: number) => Math.round(val * 10) / 10,
+    // },
+    // ratingsCount: { type: Number, default: 0 },
+    // colors: [String],
+    // tags: {
+    //   type: [String],
+    //   default: [],
+    //   validate: {
+    //     validator: function (tags: string[]) {
+    //       return tags.length <= 10;
+    //     },
+    //     message: "Tags cannot exceed 10 items",
+    //   },
+    // },
     deletedAt: { type: Date, default: null },
   },
   {

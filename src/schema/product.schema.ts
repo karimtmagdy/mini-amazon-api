@@ -11,19 +11,19 @@ export const defaultProductZod = z
         .max(100, {
           message: "Product name must be at most 100 characters long",
         }),
-      description: z
-        .string({ message: "Product description is required" })
-        .min(10, {
-          message: "Product description must be at least 10 characters long",
-        })
-        .max(1000, {
-          message: "Product description must be at most 1000 characters long",
-        }),
-      price: z
-        .number({ message: "Price is required" })
-        .min(0, { message: "Price must be at least 0" })
-        .positive("the price must be greater than zero")
-        .max(1000000, { message: "Price must be at most 1,000,000" }),
+      // description: z
+      //   .string({ message: "Product description is required" })
+      //   .min(10, {
+      //     message: "Product description must be at least 10 characters long",
+      //   })
+      //   .max(1000, {
+      //     message: "Product description must be at most 1000 characters long",
+      //   }),
+      // price: z
+      //   .number({ message: "Price is required" })
+      //   .min(0, { message: "Price must be at least 0" })
+      //   .positive("the price must be greater than zero")
+      //   .max(1000000, { message: "Price must be at most 1,000,000" }),
       stock: z
         .number({ message: "Stock is required" })
         .int()
@@ -45,20 +45,20 @@ export const defaultProductZod = z
         .min(0, { message: "discount cannot be negative" })
         .max(100, { message: "discount cannot be greater than 100" })
         .default(0),
-      colors: z.array(z.string()).optional(),
+      // colors: z.array(z.string()).optional(),
       sold: z.number().nonnegative().default(0),
-      tags: z
-        .array(z.string())
-        .max(10, { message: "the number of tags must not exceed 10." })
-        .optional(),
+      // tags: z
+      //   .array(z.string())
+      //   .max(10, { message: "the number of tags must not exceed 10." })
+      //   .optional(),
       cover: z.object({ url: z.string(), publicId: z.string() }).optional(),
-      images: z
-        .array(z.object({ url: z.string(), publicId: z.string() }))
-        .max(5, { message: "maximum 5 images" })
-        .optional(),
+      // images: z
+      //   .array(z.object({ url: z.string(), publicId: z.string() }))
+      //   .max(5, { message: "maximum 5 images" })
+      //   .optional(),
       sku: z.string().optional(),
-      ratingsAverage: z.number(),
-      ratingsCount: z.number(),
+      // ratingsAverage: z.number(),
+      // ratingsCount: z.number(),
     }),
   })
   .strict();
