@@ -1,4 +1,6 @@
-export interface AppSettingsDto {
+import { At } from "./global.dto";
+
+export type AppSettingsDto = At & {
   id: string;
   general: {
     title: string | null;
@@ -7,16 +9,8 @@ export interface AppSettingsDto {
     favicon: string | null;
   };
   system: {
-    maintenance: boolean;
+    maintenance: boolean | null;
     maintenanceMessage: string | null;
-  };
-  social: {
-    facebook: string | null;
-    twitter: string | null;
-    instagram: string | null;
-    linkedin: string | null;
-    youtube: string | null;
-    tiktok: string | null;
   };
   seo: {
     title: string | null;
@@ -38,12 +32,19 @@ export interface AppSettingsDto {
     time_format: string | null;
   };
   policy: {
+    rules: string | null;
     privacy: string | null;
     terms: string | null;
     refund: string | null;
     shipping: string | null;
     cancellation: string | null;
   };
-  createdAt?: Date | null;
-  updatedAt?: Date | null;
-}
+  social: {
+    facebook: string | null;
+    twitter: string | null;
+    instagram: string | null;
+    linkedin: string | null;
+    youtube: string | null;
+    tiktok: string | null;
+  };
+};

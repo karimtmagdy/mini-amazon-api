@@ -14,6 +14,12 @@ export const USER_ACCOUNT_STATUS = [
   "deactivated",
   "locked",
 ] as const;
+export enum UserStatusEnum {
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  ARCHIVED = "archived",
+  DEACTIVATED = "deactivated",
+}
 export type UserAccountStatus = (typeof USER_ACCOUNT_STATUS)[number];
 export const USER_ROLES = [
   "admin",

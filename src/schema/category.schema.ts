@@ -1,7 +1,7 @@
 import { z } from "zod/v4";
 import { CATEGORY_STATUS } from "../contract/category.dto";
 
-export const categoryZod = z
+export const defaultCategoryZod = z
   .object({
     body: z.object({
       name: z
@@ -20,32 +20,22 @@ export const categoryZod = z
         }),
       status: z.enum(CATEGORY_STATUS).default("active"),
       image: z.object({ url: z.string(), publicId: z.string() }).optional(),
-      slug: z.string().readonly(),
     }),
   })
   .strict();
 
-export const createCategoryZod = z
-  .object({
-    body: categoryZod.shape.body.omit({
-      slug: true,
-    }),
+export const createCategoryZod = defaultCategoryZod.shape.body.clone().strict();
+
+export const updateCategoryZod = defaultCategoryZod.shape.body
+  .pick({
+    name: true,
+    description: true,
+    status: true,
+  })
+  .refine((data) => data.status, {
+    message: "select a valid status",
   })
   .strict();
 
-export const updateCategoryZod = z
-  .object({
-    body: categoryZod.shape.body
-      .pick({
-        name: true,
-        description: true,
-        status: true,
-      })
-      .refine((data) => data.status, {
-        message: "select a valid status",
-      }),
-  })
-  .strict();
-
-export type CreateCategory = z.infer<typeof createCategoryZod>["body"];
-export type UpdateCategory = z.infer<typeof updateCategoryZod>["body"];
+export type CreateCategory = z.infer<typeof createCategoryZod>;
+export type UpdateCategory = z.infer<typeof updateCategoryZod>;

@@ -1,7 +1,7 @@
 import { Brand } from "../models/brand.model";
 import { BrandDto, BrandStatusEnum } from "../contract/brand.dto";
 import { UpdateQuery } from "mongoose";
-import { QueryString } from "../schemas/standred.schema";
+import { QueryString } from "../schema/standred.schema";
 import { APIFeatures } from "../class/api.feature";
 
 export class BrandRepo {

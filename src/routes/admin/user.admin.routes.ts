@@ -2,15 +2,15 @@ import { Router } from "express";
 import { userController } from "../../controllers/user.controller";
 import { authenticated, checkPermission } from "../../middlewares/authroized";
 import { idParamZod, validate } from "../../middlewares/validate";
-import { changeRoleZod, createUserZod } from "../../schemas/user.schema";
-import { multipleBulkDeleteZod } from "../../schemas/standred.schema";
+import { changeRoleZod, createUserZod } from "../../schema/user.schema";
+import { multipleBulkDeleteZod } from "../../schema/standred.schema";
 
 const router = Router();
 router.use(authenticated, checkPermission(["admin"]));
 router
   .route("/")
   .get(userController.getAll)
-  .post(validate(createUserZod), userController.create);
+  .post(validate(createUserZod,'body'), userController.create);
 
 router
   .route("/:id")

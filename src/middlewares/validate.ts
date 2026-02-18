@@ -1,6 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
 import { z } from "zod";
-import { logger } from "../lib/logger";
 
 export const validate =
   <T extends z.ZodTypeAny>(
@@ -10,8 +9,6 @@ export const validate =
   (req: Request, _: Response, next: NextFunction) => {
     try {
       if (source === "all") {
-        logger.log("Validating:", req.method, req.originalUrl);
-        // Ensure strictly objects, even if empty
         const parsed = schema.parse({
           body: req.body || {},
           query: req.query || {},
@@ -31,7 +28,6 @@ export const validate =
       next(error);
     }
   };
-
 export const idParamZod = z.object({
   params: z.object({
     id: z
@@ -39,4 +35,4 @@ export const idParamZod = z.object({
       .regex(/^[0-9a-fA-F]{24}$/, "Invalid ID"),
   }),
 }) satisfies z.ZodType<{ params: { id: string } }>;
-export type IdParam = z.infer<typeof idParamZod>["params"]["id"];
+export type IdParam = z.infer<typeof idParamZod>["params"];

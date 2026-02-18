@@ -1,6 +1,6 @@
 import { Model, Query, QueryFilter } from "mongoose";
-import { QueryString } from "../schemas/standred.schema";
-import { APIFeaturesResult } from "../schemas/standred.schema";
+import { QueryString } from "../schema/standred.schema";
+import { APIFeaturesResult } from "../schema/standred.schema";
 
 class APIFeatures<T> {
   private model: Model<T>;

@@ -1,8 +1,9 @@
 import { User } from "../models/user.model";
 // import type { UserDto } from "../contract/user.dto";
 import { DEFAULT_USER_IMAGE } from "../contract/global.dto";
-import { QueryString } from "../schemas/standred.schema";
+import { QueryString } from "../schema/standred.schema";
 import { APIFeatures } from "../class/api.feature";
+import { UserStatusEnum } from "../contract/user.dto";
 // import { CreateUser } from "../schemas/user.schema";
 
 /**
@@ -13,9 +14,6 @@ import { APIFeatures } from "../class/api.feature";
 export class UserRepo {
   async findByEmail(email: string) {
     return await User.findOne({ email }).select("+password");
-  }
-  async findByUsername(username: string) {
-    return await User.findOne({ username });
   }
   async findById(id: string) {
     return await User.findById(id);
@@ -44,7 +42,7 @@ export class UserRepo {
     return await User.findByIdAndUpdate(
       id,
       {
-        status: "archived",
+        status: UserStatusEnum.ARCHIVED,
         deletedAt: new Date(),
         image: {
           secureUrl: DEFAULT_USER_IMAGE,
@@ -71,7 +69,7 @@ export class UserRepo {
   async deactivate(id: string) {
     return await User.findByIdAndUpdate(
       id,
-      { status: "deactivated" },
+      { status: UserStatusEnum.DEACTIVATED },
       { new: true },
     );
   }
@@ -79,7 +77,7 @@ export class UserRepo {
     return await User.findByIdAndUpdate(
       id,
       {
-        status: "active",
+        status: UserStatusEnum.ACTIVE,
         lockedUntil: null,
         failedLoginAttempts: 0,
       },
@@ -89,7 +87,7 @@ export class UserRepo {
   async deleteBulk(ids: string[]) {
     return await User.updateMany(
       { id: { $in: ids } },
-      { status: "inactive", deletedAt: new Date() },
+      { status: UserStatusEnum.ARCHIVED, deletedAt: new Date() },
     );
   }
 }

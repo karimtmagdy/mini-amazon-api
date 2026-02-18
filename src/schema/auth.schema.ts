@@ -1,8 +1,4 @@
-import * as z from "zod/v4";
-import { defaultUserZod } from "./user.schema";
-
-export const emailRegex: RegExp =
-  /^[a-zA-Z0-9._%+-]+@(gmail|yahoo|outlook|hotmail)\.(com|net|org)$/;
+import { z } from "zod/v4";
 
 export const changePasswordSchema = z.object({
   body: z
@@ -43,6 +39,7 @@ export type DeactivateUser = z.infer<typeof deactivateUserSchema>["body"];
 
 // --------------------------------
 import { type UserDto } from "../contract/user.dto";
+import { mongoIdRegex } from "./standred.schema";
 
 // export const updateStatusSchema = z.object({
 //   body: z.object({
@@ -57,7 +54,7 @@ import { type UserDto } from "../contract/user.dto";
 export const bulkDeleteZod = z.object({
   body: z.object({
     ids: z
-      .array(z.string().regex(/^[0-9a-fA-F]{24}$/, "Invalid User ID format"))
+      .array(z.string().regex(mongoIdRegex, "Invalid User ID format"))
       .min(1, "Please provide at least one user ID"),
   }),
 }) satisfies z.ZodType<{
@@ -81,10 +78,7 @@ const deactivateUserZod = z.object({
   }),
 });
 
-// export type UpdateUser = z.infer<typeof updateUserSchema>["body"];
-// export type UpdateStatus = z.infer<typeof updateStatusSchema>["body"];
 export type BulkDelete = z.infer<typeof bulkDeleteZod>["body"];
-// export type DefaultUser = z.infer<typeof userSchema>;
 export type DeleteUser = z.infer<typeof deleteUserZod>["body"];
 type DeactivateUserInput = z.infer<typeof deactivateUserZod>["body"];
 export type DeleteUserInput = z.infer<typeof deleteUserZod>["body"];

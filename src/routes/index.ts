@@ -12,3 +12,5 @@ export const setupRoutes = (app: Express) => {
     app.use(RV1 + "/admin" + route.path, route.router);
   });
 };
+  // Cron Jobs
+  // app.use("/api", CronProjectRoutes);

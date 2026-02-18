@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
 import { catchError } from "../lib/catch.error";
 import { CategoryService, categoryService } from "../services/category.service";
-import { CreateCategory, UpdateCategory } from "../schemas/category.schema";
-import { GlobalResponse, QueryString } from "../schemas/standred.schema";
+import { CreateCategory, UpdateCategory } from "../schema/category.schema";
+import {
+  QueryString,
+  ResponseWithMeta,
+  ResponseZod,
+} from "../schema/standred.schema";
 import { CategoryDto } from "../contract/category.dto";
 
 export class CategoryController {
@@ -17,7 +21,7 @@ export class CategoryController {
       status: "success",
       message: "category has been created",
       data: category,
-    } satisfies GlobalResponse<CategoryDto>);
+    } satisfies ResponseZod<CategoryDto>);
   });
   softDelete = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
@@ -26,7 +30,7 @@ export class CategoryController {
       status: "success",
       message: "category has been moved to trash",
       data: category,
-    } satisfies GlobalResponse<CategoryDto>);
+    } satisfies ResponseZod<CategoryDto>);
   });
   update = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
@@ -40,7 +44,7 @@ export class CategoryController {
       status: "success",
       message: "category has been updated",
       data: category,
-    } satisfies GlobalResponse<CategoryDto>);
+    } satisfies ResponseZod<CategoryDto>);
   });
   getOne = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
@@ -48,7 +52,7 @@ export class CategoryController {
     res.status(200).json({
       status: "success",
       data: category,
-    } satisfies GlobalResponse<CategoryDto>);
+    } satisfies ResponseZod<CategoryDto>);
   });
   getAll = catchError(async (req: Request, res: Response) => {
     const queryData = req.query as unknown as QueryString;
@@ -57,14 +61,14 @@ export class CategoryController {
       status: "success",
       meta: categories.pagination,
       data: categories.data,
-    } satisfies GlobalResponse<CategoryDto[]>);
+    } satisfies ResponseWithMeta<CategoryDto[]>);
   });
   getStats = catchError(async (req: Request, res: Response) => {
     const { stats } = await this.categoryService.getStats();
     res.status(200).json({
       status: "success",
       data: stats,
-    } satisfies GlobalResponse<any>);
+    } satisfies ResponseZod<any>);
   });
 }
 

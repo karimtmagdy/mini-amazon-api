@@ -1,5 +1,5 @@
-import { AppSettings } from "../models/app.settings.model";
-import type { AppSettingsDto } from "../contract/app-settings.dto";
+import { AppSettings } from "../models/app.model";
+import type { AppSettingsDto } from "../contract/app.dto";
 
 /**
  * Design Pattern: Repository Pattern

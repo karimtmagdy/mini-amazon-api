@@ -1,11 +1,10 @@
 import type { Request, Response } from "express";
 import { authService, type AuthService } from "../services/auth.service";
 import { catchError } from "../lib/catch.error";
-import type { LoginUser } from "../schemas/user.schema";
+import type { LoginUser } from "../schema/user.schema";
 import { BaseCookieOptions, CookieOptions } from "../lib/cookie-options";
 import { getUserAgent } from "../lib/user-agent";
-import { GlobalResponse } from "../schemas/standred.schema";
-
+import { ResponseZod } from "../schema/standred.schema";
 /**
  * Design Pattern: MVC Controller
  * Purpose: Handles authentication-related HTTP requests and manages cookie-based session tokens.
@@ -26,7 +25,7 @@ export class AuthController {
       status: "success",
       message: `welcome back ${user.username}`,
       data: { token, user },
-    } satisfies GlobalResponse<{
+    } satisfies ResponseZod<{
       token: string;
       user: typeof user;
     }>);
@@ -71,7 +70,7 @@ export class AuthController {
       status: "success",
       message: "Token refreshed successfully",
       data: { token: accessToken },
-    } satisfies GlobalResponse<{ token: string }>);
+    } satisfies ResponseZod<{ token: string }>);
   });
 }
 export const authController = new AuthController(authService);

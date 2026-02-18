@@ -4,7 +4,7 @@ import { idParamZod, validate } from "../../middlewares/validate";
 import {
   createCategoryZod,
   updateCategoryZod,
-} from "../../schemas/category.schema";
+} from "../../schema/category.schema";
 import { authenticated, checkPermission } from "../../middlewares/authroized";
 const router = Router();
 

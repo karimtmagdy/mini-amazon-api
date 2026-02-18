@@ -1,8 +1,5 @@
-import {
-  appSettingsRepo,
-  type AppSettingsRepository,
-} from "../repo/app-settings.repo";
-import type { AppSettingsDto } from "../contract/app-settings.dto";
+import { appSettingsRepo, type AppSettingsRepository } from "../repo/app.repo";
+import type { AppSettingsDto } from "../contract/app.dto";
 
 /**
  * Design Pattern: Service Layer

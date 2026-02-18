@@ -1,8 +1,12 @@
 import { Request, Response } from "express";
 import { catchError } from "../lib/catch.error";
 import { BrandService, brandService } from "../services/brand.service";
-import { CreateBrand, UpdateBrand } from "../schemas/brand.schema";
-import { GlobalResponse, QueryString } from "../schemas/standred.schema";
+import { CreateBrand, UpdateBrand } from "../schema/brand.schema";
+import {
+  QueryString,
+  ResponseWithMeta,
+  ResponseZod,
+} from "../schema/standred.schema";
 import { BrandDto } from "../contract/brand.dto";
 
 export class BrandController {
@@ -14,7 +18,7 @@ export class BrandController {
       status: "success",
       message: "brand has been created",
       data: brand,
-    } satisfies GlobalResponse<BrandDto>);
+    } satisfies ResponseZod<BrandDto>);
   });
   softDelete = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
@@ -23,7 +27,7 @@ export class BrandController {
       status: "success",
       message: "brand has been moved to trash",
       data: brand,
-    } satisfies GlobalResponse<BrandDto>);
+    } satisfies ResponseZod<BrandDto>);
   });
   update = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
@@ -37,7 +41,7 @@ export class BrandController {
       status: "success",
       message: "brand has been updated",
       data: brand,
-    } satisfies GlobalResponse<BrandDto>);
+    } satisfies ResponseZod<BrandDto>);
   });
   getOne = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
@@ -45,7 +49,7 @@ export class BrandController {
     res.status(200).json({
       status: "success",
       data: brand,
-    } satisfies GlobalResponse<BrandDto>);
+    } satisfies ResponseZod<BrandDto>);
   });
   getAll = catchError(async (req: Request, res: Response) => {
     const queryData = req.query as unknown as QueryString;
@@ -54,7 +58,7 @@ export class BrandController {
       status: "success",
       meta: brands.pagination,
       data: brands.data,
-    } satisfies GlobalResponse<BrandDto[]>);
+    } satisfies ResponseWithMeta<BrandDto[]>);
   });
 }
 

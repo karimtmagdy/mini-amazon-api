@@ -1,7 +1,7 @@
 import { ApiError } from "../class/api.error";
 import { UserRepo, userRepo } from "../repo/user.repo";
-import { QueryString } from "../schemas/standred.schema";
-import { CreateUser, UpdateUser } from "../schemas/user.schema";
+import { QueryString } from "../schema/standred.schema";
+import { CreateUser, UpdateUser } from "../schema/user.schema";
 // import { cloudService } from "../config/cloudinary";
 // import fs from "fs";
 /**

@@ -4,8 +4,6 @@ import { z } from "zod";
 import { Error as MongooseError } from "mongoose";
 import { ApiError } from "../class/api.error";
 
-
-
 export function errorHandler(
   err: any,
   _req: Request,
@@ -44,17 +42,16 @@ export function errorHandler(
 
   // 5. Zod Validation Error
   if (err instanceof z.ZodError || err.name === "ZodError") {
-    const issues = err.issues || [];
-    const formattedErrors = issues.map((issue: z.ZodIssue) => ({
-      field: issue.path.join("."),
+    const formatts = err.issues.map((issue: z.ZodIssue) => ({
+      field: issue.path.slice(0).join("."),
       message: issue.message,
     }));
-    const mainIssue = issues[0]?.message || "Validation Error";
-
+    // const firstMessage = err.issues[0]?.message;
     return res.status(400).json({
       status: "fail",
-      message: mainIssue,
-      errors: formattedErrors,
+      // message: firstMessage,
+      errors: formatts,
+      // ...formatts[0]
     });
   }
 

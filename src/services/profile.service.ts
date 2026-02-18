@@ -1,6 +1,6 @@
 import { ApiError } from "../class/api.error";
 import { UserRepo, userRepo } from "../repo/user.repo";
-import { UpdateUserProfile } from "../schemas/user.schema";
+import { UpdateUserProfile } from "../schema/user.schema";
 import { cloudService } from "../config/cloudinary";
 import fs from "fs";
 /**

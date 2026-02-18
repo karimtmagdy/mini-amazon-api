@@ -3,7 +3,7 @@ import slugify from "slugify";
 import { PRODUCT_STATUS, ProductDto } from "../contract/product.dto";
 import { Category } from "./category.model";
 import { Brand } from "./brand.model";
-import { SubCategory } from "./sub.category.model";
+import { SubCategory } from "./subcategory.model";
 
 const ProductSchema = new Schema<ProductDto>(
   {
@@ -81,14 +81,14 @@ const ProductSchema = new Schema<ProductDto>(
       },
     },
     toObject: { virtuals: true },
-  }
+  },
 );
 
 // Unified Aggregation logic for Category, Brand, and SubCategory productsCount
 ProductSchema.statics.countProductsForModels = async function (
   ids: Types.ObjectId[],
   field: "category" | "brand" | "subcategory",
-  Model: any
+  Model: any,
 ) {
   if (!ids || ids.length === 0) return;
 
@@ -106,7 +106,7 @@ ProductSchema.statics.countProductsForModels = async function (
   ]);
 
   const statsMap = new Map(
-    stats.map((s: any) => [s._id.toString(), s.nProduct])
+    stats.map((s: any) => [s._id.toString(), s.nProduct]),
   );
 
   for (const id of ids) {
@@ -132,13 +132,21 @@ ProductSchema.pre("save", function () {
 ProductSchema.post("save", async function () {
   const ProductModel = this.constructor as any;
   if (this.category?.length > 0) {
-    await ProductModel.countProductsForModels(this.category, "category", Category);
+    await ProductModel.countProductsForModels(
+      this.category,
+      "category",
+      Category,
+    );
   }
   if (this.brand) {
     await ProductModel.countProductsForModels([this.brand], "brand", Brand);
   }
   if (this.subcategory?.length > 0) {
-    await ProductModel.countProductsForModels(this.subcategory, "subcategory", SubCategory);
+    await ProductModel.countProductsForModels(
+      this.subcategory,
+      "subcategory",
+      SubCategory,
+    );
   }
 });
 
@@ -158,16 +166,29 @@ ProductSchema.post("findOneAndUpdate", async function (doc) {
   const ProductModel = this.model as any;
   const oldValues = (this as any)._oldValues || {};
 
-  const updateStats = async (field: "category" | "brand" | "subcategory", Model: any) => {
-    const oldVal = oldValues[field] ? (Array.isArray(oldValues[field]) ? oldValues[field] : [oldValues[field]]) : [];
-    const newVal = doc[field] ? (Array.isArray(doc[field]) ? doc[field] : [doc[field]]) : [];
-    
+  const updateStats = async (
+    field: "category" | "brand" | "subcategory",
+    Model: any,
+  ) => {
+    const oldVal = oldValues[field]
+      ? Array.isArray(oldValues[field])
+        ? oldValues[field]
+        : [oldValues[field]]
+      : [];
+    const newVal = doc[field]
+      ? Array.isArray(doc[field])
+        ? doc[field]
+        : [doc[field]]
+      : [];
+
     const allIds = [
       ...new Set([
         ...oldVal.map((id: any) => id.toString()),
         ...newVal.map((id: any) => id.toString()),
       ]),
-    ].filter(Boolean).map((id) => new Types.ObjectId(id));
+    ]
+      .filter(Boolean)
+      .map((id) => new Types.ObjectId(id));
 
     if (allIds.length > 0) {
       await ProductModel.countProductsForModels(allIds, field, Model);
@@ -183,13 +204,21 @@ ProductSchema.post("findOneAndDelete", async function (doc) {
   if (!doc) return;
   const ProductModel = doc.constructor as any;
   if (doc.category?.length > 0) {
-    await ProductModel.countProductsForModels(doc.category, "category", Category);
+    await ProductModel.countProductsForModels(
+      doc.category,
+      "category",
+      Category,
+    );
   }
   if (doc.brand) {
     await ProductModel.countProductsForModels([doc.brand], "brand", Brand);
   }
   if (doc.subcategory?.length > 0) {
-    await ProductModel.countProductsForModels(doc.subcategory, "subcategory", SubCategory);
+    await ProductModel.countProductsForModels(
+      doc.subcategory,
+      "subcategory",
+      SubCategory,
+    );
   }
 });
 

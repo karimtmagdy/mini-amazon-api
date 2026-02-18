@@ -1,10 +1,10 @@
-import {  Types } from "mongoose";
+import { Types } from "mongoose";
+import { At } from "./global.dto";
 
-export type SubCategoryDto = {
+export type SubCategoryDto = At & {
   name: string;
   slug: string;
   description?: string;
   category: (Types.ObjectId | string)[];
-  productsCount: number;
-  deletedAt?: Date | null;
-}
+  products: number;
+};

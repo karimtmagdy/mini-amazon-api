@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { profileController } from "../../controllers/profile.controller";
 import { authenticated } from "../../middlewares/authroized";
-import { updateProfileZod } from "../../schemas/user.schema";
+import { updateProfileZod } from "../../schema/user.schema";
 import { idParamZod, validate } from "../../middlewares/validate";
-import { deactivateUserSchema } from "../../schemas/auth.schema";
+import { deactivateUserSchema } from "../../schema/auth.schema";
 
 const router = Router();
 

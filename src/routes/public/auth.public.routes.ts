@@ -1,14 +1,14 @@
 import { Router } from "express";
 import { authController } from "../../controllers/auth.controller";
 import { validate } from "../../middlewares/validate";
-import { refreshTokenSchema } from "../../schemas/auth.schema";
+import { refreshTokenSchema } from "../../schema/auth.schema";
 import { authenticated } from "../../middlewares/authroized";
-import { loginUserSchema } from "../../schemas/user.schema";
+import { loginUserZod } from "../../schema/user.schema";
 
 const router = Router();
 
 // router.post("/register", authController.register);
-router.post("/login", validate(loginUserSchema), authController.login);
+router.post("/login", validate(loginUserZod,'body'), authController.login);
 router.post("/logout", authenticated, authController.logout);
 router.post(
   "/logout-devices",
@@ -17,7 +17,7 @@ router.post(
 );
 router.post(
   "/refresh-token",
-  validate(refreshTokenSchema),
+  validate(refreshTokenSchema,),
   authController.refresh,
 );
 export default {

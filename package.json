@@ -17,7 +17,9 @@
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "deploy": "vercel build && vercel --prod --yes",
-    "vercel": "vercel dev"
+    "vercel": "vercel dev",
+    "clean": "npx tsx src/scripts/clean-fields.ts",
+    "test:cleanup": "npx tsx src/scripts/test-cleanup.ts"
   },
   "author": "karimtmagdy",
   "license": "Apache-2.0",

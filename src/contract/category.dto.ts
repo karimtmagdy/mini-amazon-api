@@ -12,6 +12,6 @@ export type CategoryDto = At & {
   image: Image;
   slug: string;
   status: CategoryStatus;
-  productsCount: number;
+  products: number;
   deletedAt: Date | null;
 };

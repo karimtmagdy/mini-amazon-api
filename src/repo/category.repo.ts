@@ -2,7 +2,7 @@ import { UpdateQuery } from "mongoose";
 import { CategoryDto, CategoryStatusEnum } from "../contract/category.dto";
 import { Category } from "../models/category.model";
 import { Product } from "../models/product.model";
-import { QueryString } from "../schemas/standred.schema";
+import { QueryString } from "../schema/standred.schema";
 import { APIFeatures } from "../class/api.feature";
 
 export class CategoryRepo {

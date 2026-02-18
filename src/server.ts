@@ -17,9 +17,11 @@ void (async () => {
       });
     }
     await Database.getInstance();
+
+    // Start cron jobs for automated cleanup tasks
+    // startCronJobs();
   } catch (error) {
     logger.error("🔥 Failed to start server:", error);
-    
   }
 })();
 process.on("uncaughtException", (error) => {
