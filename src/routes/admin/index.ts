@@ -5,6 +5,7 @@ import statsRoutes from "./stats.admin.routes";
 import categoryRoutes from "./category.admin.routes";
 import subCategoryRoutes from "./subcategory.admin.routes";
 import brandRoutes from "./brand.admin.routes";
+import productRoutes from "./product.admin.routes";
 export default [
   appSettingsRoutes,
   userRoutes,
@@ -12,4 +13,5 @@ export default [
   categoryRoutes,
   subCategoryRoutes,
   brandRoutes,
+  productRoutes,
 ] as Route[];

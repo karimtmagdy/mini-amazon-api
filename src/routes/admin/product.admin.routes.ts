@@ -58,4 +58,7 @@ router.post("/", validate(createProductZod), productController.create);
 //   productController.updateStock.bind(productController)
 // );
 
-// export { router as productAdminRouter };
+export default {
+  router,
+  path: "/products",
+};
