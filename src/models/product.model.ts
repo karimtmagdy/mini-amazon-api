@@ -25,7 +25,7 @@ const ProductSchema = new Schema<ProductDto>(
         type: String,
         default: "https://ui.shadcn.com/placeholder.svg",
       },
-      publicId: { type: String, default: "" },
+      publicId: { type: String, default: null },
     },
     sku: { type: String, unique: true, sparse: true },
     // discount: { type: Number, default: 0, min: 0, max: 100 },

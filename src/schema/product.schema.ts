@@ -39,12 +39,12 @@ export const defaultProductZod = z
         .array(z.string().regex(mongoIdRegex, "Invalid subcategory ID"))
         .optional(),
       brand: z.string().regex(mongoIdRegex, "Invalid brand ID").optional(),
-      discount: z
-        .number()
-        .nonnegative()
-        .min(0, { message: "discount cannot be negative" })
-        .max(100, { message: "discount cannot be greater than 100" })
-        .default(0),
+      // discount: z
+      //   .number()
+      //   .nonnegative()
+      //   .min(0, { message: "discount cannot be negative" })
+      //   .max(100, { message: "discount cannot be greater than 100" })
+      //   .default(0),
       // colors: z.array(z.string()).optional(),
       sold: z.number().nonnegative().default(0),
       // tags: z
@@ -56,7 +56,7 @@ export const defaultProductZod = z
       //   .array(z.object({ url: z.string(), publicId: z.string() }))
       //   .max(5, { message: "maximum 5 images" })
       //   .optional(),
-      sku: z.string().optional(),
+      // sku: z.string().optional(),
       // ratingsAverage: z.number(),
       // ratingsCount: z.number(),
     }),

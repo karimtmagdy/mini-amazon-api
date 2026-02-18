@@ -16,7 +16,7 @@ const router = Router();
 
 router.use(authenticated, checkPermission(["admin", "manager"]));
 
-router.post("/", validate(createProductZod), productController.create);
+router.post("/", validate(createProductZod, "body"), productController.create);
 
 // router.get(
 //   "/inactive",
