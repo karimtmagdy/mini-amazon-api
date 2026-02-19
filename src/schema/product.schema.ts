@@ -62,11 +62,9 @@ export const defaultProductZod = z
     }),
   })
   .strict();
-
-export const createProductZod = defaultProductZod.shape.body
-  .clone()
-  .strict();
-  // .required();
+// "message": "Invalid input: expected nonoptional, received undefined"
+export const createProductZod = defaultProductZod.shape.body.clone().strict();
+// .required();
 export const updateProductZod = defaultProductZod.shape.body.partial().strict();
 export const updateStockZod = defaultProductZod.shape.body
   .pick({

@@ -10,6 +10,11 @@ export class CategoryService {
   constructor(private readonly categoryRepo: CategoryRepo) {}
 
   async create(data: CreateCategory, file?: Express.Multer.File) {
+    const nameExists = await this.categoryRepo.findByName(data.name);
+    if (nameExists) {
+      throw new ApiError("Category name already exists", 400);
+    }
+
     if (file) {
       const { url, publicId } = await cloudService.uploadSinglePhoto(
         file.path,
@@ -24,6 +29,14 @@ export class CategoryService {
   async update(id: string, data: UpdateCategory, file?: Express.Multer.File) {
     const exists = await this.categoryRepo.findById(id);
     if (!exists) throw new ApiError("Category not found", 404);
+
+    if (data.name) {
+      const nameExists = await this.categoryRepo.findByName(data.name);
+      if (nameExists && nameExists._id.toString() !== id) {
+        throw new ApiError("Category name already exists", 400);
+      }
+    }
+
     let image = exists.image;
     if (file) {
       const { url, publicId } = await cloudService.uploadSinglePhoto(

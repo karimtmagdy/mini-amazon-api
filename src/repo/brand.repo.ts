@@ -9,6 +9,12 @@ export class BrandRepo {
     const brand = await Brand.create(data);
     return brand;
   }
+  async findByName(name: string) {
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return await Brand.findOne({
+      name: { $regex: new RegExp(`^${escapedName}$`, "i") },
+    }).lean();
+  }
   async update(id: string, data: UpdateQuery<BrandDto>) {
     const brand = await Brand.findByIdAndUpdate(id, data, {
       new: true,

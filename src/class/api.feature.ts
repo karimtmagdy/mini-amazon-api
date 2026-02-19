@@ -42,10 +42,10 @@ class APIFeatures<T> {
   sort(): this {
     if (this.QS.sort) {
       // Convert comma-separated values to space-separated for Mongoose
-      const sortBy = (this.QS.sort as string).split(",").join(" ");
+      const sortBy = (this.QS.sort as string).split(",").join(" ") + " id";
       this.query = this.query.sort(sortBy);
     } else {
-      this.query = this.query.sort("-createdAt");
+      this.query = this.query.sort("-createdAt id");
     }
     return this;
   }

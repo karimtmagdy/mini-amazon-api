@@ -20,7 +20,7 @@ export const validate =
         if (parsed.params) req.params = parsed.params;
         if (parsed.cookies) req.cookies = parsed.cookies;
       } else {
-        const parsed = schema.parse(req[source] || {});
+        const parsed = schema.parse(req[source]);
         req[source] = parsed;
       }
       next();

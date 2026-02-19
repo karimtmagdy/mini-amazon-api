@@ -10,6 +10,11 @@ export class BrandService {
   constructor(private readonly brandRepo: BrandRepo) {}
 
   async create(data: CreateBrand, file?: Express.Multer.File) {
+    const nameExists = await this.brandRepo.findByName(data.name);
+    if (nameExists) {
+      throw new ApiError("Brand name already exists", 400);
+    }
+
     if (file) {
       const { url, publicId } = await cloudService.uploadSinglePhoto(
         file.path,
@@ -24,6 +29,14 @@ export class BrandService {
   async update(id: string, data: UpdateBrand, file?: Express.Multer.File) {
     const exists = await this.brandRepo.findById(id);
     if (!exists) throw new ApiError("Brand not found", 404);
+
+    if (data.name) {
+      const nameExists = await this.brandRepo.findByName(data.name);
+      if (nameExists && nameExists._id.toString() !== id) {
+        throw new ApiError("Brand name already exists", 400);
+      }
+    }
+
     let image = exists.image;
     if (file) {
       const { url, publicId } = await cloudService.uploadSinglePhoto(

@@ -25,11 +25,7 @@ export class ProductRepo {
   }
 
   async findAll(query: QueryString) {
-    const features = new APIFeatures(Product, query)
-    //   .filter()
-    //   .sort()
-    //   .limitFields()
-    //   .paginate();
+    const features = new APIFeatures(Product, query);
     const products = await features
       .filter()
       .populate({ path: "category", select: "name" })

@@ -9,6 +9,12 @@ export class SubCategoryRepo {
     const subCategory = await SubCategory.create(data);
     return subCategory;
   }
+  async findByName(name: string) {
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return await SubCategory.findOne({
+      name: { $regex: new RegExp(`^${escapedName}$`, "i") },
+    }).lean();
+  }
   async update(id: string, data: UpdateQuery<SubCategoryDto>) {
     const subCategory = await SubCategory.findByIdAndUpdate(id, data, {
       new: true,

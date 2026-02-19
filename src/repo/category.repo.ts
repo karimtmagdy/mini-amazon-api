@@ -10,6 +10,12 @@ export class CategoryRepo {
     const category = await Category.create(data);
     return category;
   }
+  async findByName(name: string) {
+    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    return await Category.findOne({
+      name: { $regex: new RegExp(`^${escapedName}$`, "i") },
+    }).lean();
+  }
   async update(id: string, data: UpdateQuery<CategoryDto>) {
     const category = await Category.findByIdAndUpdate(id, data, {
       new: true,
