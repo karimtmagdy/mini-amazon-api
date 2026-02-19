@@ -42,16 +42,15 @@ export function errorHandler(
 
   // 5. Zod Validation Error
   if (err instanceof z.ZodError || err.name === "ZodError") {
-    const formatts = err.issues.map((issue: z.ZodIssue) => ({
-      field: issue.path.slice(0).join("."),
+    const formattedErrors = err.issues.map((issue: z.ZodIssue) => ({
+      field: issue.path.join("."),
       message: issue.message,
     }));
-    // const firstMessage = err.issues[0]?.message;
+    const summaryMessage = err.issues[0]?.message || "Validation Error";
     return res.status(400).json({
       status: "fail",
-      // message: firstMessage,
-      errors: formatts,
-      // ...formatts[0]
+      message: summaryMessage,
+      errors: formattedErrors,
     });
   }
 

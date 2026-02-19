@@ -30,7 +30,7 @@ export const createBrandZod = defaultBrandZod.shape.body
   .strict();
 
 export const updateBrandZod = defaultBrandZod.shape.body
-  .pick({ name: true, status: true })
+  .pick({ name: true, status: true, image: true })
   .refine((data) => data.status, {
     message: "select a valid status",
   })
