@@ -1,5 +1,8 @@
 import { UpdateQuery } from "mongoose";
-import { SubCategoryDto } from "../contract/subcategory.dto";
+import {
+  SubCategoryDto,
+  SubCategoryStatusEnum,
+} from "../contract/subcategory.dto";
 import { SubCategory } from "../models/subcategory.model";
 import { QueryString } from "../schema/standred.schema";
 import { APIFeatures } from "../class/api.feature";
@@ -23,7 +26,11 @@ export class SubCategoryRepo {
     return subCategory;
   }
   async delete(id: string) {
-    const category = await SubCategory.findByIdAndUpdate(id, { new: true });
+    const category = await SubCategory.findByIdAndUpdate(
+      id,
+      { status: SubCategoryStatusEnum.ARCHIVED, deletedAt: new Date() },
+      { new: true },
+    );
     return category;
   }
   async findById(id: string) {
@@ -46,5 +53,7 @@ export class SubCategoryRepo {
 
     return subCategories;
   }
+
+
 }
 export const subCategoryRepo = new SubCategoryRepo();

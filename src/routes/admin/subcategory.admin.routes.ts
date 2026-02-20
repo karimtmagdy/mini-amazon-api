@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { subCategoryController } from "../../controllers/subcategory.controller";
-import { idParamZod, validate } from "../../middlewares/validate";
+import { idZod, validate } from "../../middlewares/validate";
 import {
   createSubCategoryZod,
   updateSubCategoryZod,
@@ -17,15 +17,16 @@ router.post(
 router
   .route("/:id")
   .patch(
-    validate(idParamZod, "params"),
+    validate(idZod, "params"),
     validate(updateSubCategoryZod, "body"),
     subCategoryController.update,
   )
   .delete(
     checkPermission(["admin"]),
-    validate(idParamZod, "params"),
+    validate(idZod, "params"),
     subCategoryController.delete,
   );
+
 
 export default {
   path: "/subcategories",

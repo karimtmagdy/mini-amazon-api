@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CATEGORY_STATUS, CategoryStatusEnum } from "../contract/category.dto";
 
 const defaultSubCategoryZod = z.object({
   body: z.object({
@@ -12,9 +13,10 @@ const defaultSubCategoryZod = z.object({
       .max(500, { message: "Description must be at most 500 characters" })
       .optional(),
     category: z.array(z.string()).min(1, "At least one category is required"),
-    isActive: z.boolean().default(false).optional(),
+    status: z.enum(CATEGORY_STATUS).default(CategoryStatusEnum.ACTIVE),
   }),
 });
+
 export const createSubCategoryZod = defaultSubCategoryZod.shape.body.clone();
 export const updateSubCategoryZod = defaultSubCategoryZod.shape.body
   .clone()

@@ -1,6 +1,10 @@
 import { model, Schema, Types } from "mongoose";
 import slugify from "slugify";
-import { SubCategoryDto } from "../contract/subcategory.dto";
+import {
+  SUBCATEGORY_STATUS,
+  SubCategoryDto,
+  SubCategoryStatusEnum,
+} from "../contract/subcategory.dto";
 
 const SubCategorySchema = new Schema<SubCategoryDto>(
   {
@@ -20,7 +24,12 @@ const SubCategorySchema = new Schema<SubCategoryDto>(
       maxlength: [500, "Description must be at most 500 characters"],
     },
     category: [{ type: Types.ObjectId, ref: "Category", required: true }],
-    // products: { type: Number, default: 0 },
+    status: {
+      type: String,
+      enum: SUBCATEGORY_STATUS,
+      default: SubCategoryStatusEnum.ACTIVE,
+    },
+
     deletedAt: { type: Date, default: null },
   },
   {
@@ -53,11 +62,11 @@ SubCategorySchema.pre("findOneAndUpdate", function () {
   }
 });
 // إضافة virtual لحساب عدد المنتجات من موديل الـ Product
-SubCategorySchema.virtual('products', {
-  ref: 'Product', // اسم موديل المنتجات
-  localField: 'id',
-  foreignField: 'subcategory', // الحقل اللي في منتج ومربوط بالساب كايتجوري
-  count: true // يرجع العدد فقط مش الـ objects كاملة
+SubCategorySchema.virtual("products", {
+  ref: "Product", // اسم موديل المنتجات
+  localField: "id",
+  foreignField: "subcategory", // الحقل اللي في منتج ومربوط بالساب كايتجوري
+  count: true, // يرجع العدد فقط مش الـ objects كاملة
 });
 export const SubCategory = model<SubCategoryDto>(
   "SubCategory",

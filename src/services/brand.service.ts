@@ -32,7 +32,7 @@ export class BrandService {
 
     if (data.name) {
       const nameExists = await this.brandRepo.findByName(data.name);
-      if (nameExists && nameExists._id.toString() !== id) {
+      if (nameExists && nameExists._id.toString() !== id.toString()) {
         throw new ApiError("Brand name already exists", 400);
       }
     }

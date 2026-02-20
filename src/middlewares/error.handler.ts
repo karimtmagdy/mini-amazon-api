@@ -13,6 +13,17 @@ export function errorHandler(
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal Server Error";
 
+  if (statusCode >= 400) {
+    console.error("❌ ERROR:", {
+      status: err.status,
+      statusCode,
+      message,
+      errors: err.errors,
+      stack: err.stack,
+    });
+  }
+
+
   // 2. Mongoose Cast Error (Invalid ID, etc.)
   if (err instanceof MongooseError.CastError || err.name === "CastError") {
     return res.status(400).json({

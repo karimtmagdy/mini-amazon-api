@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { categoryController } from "../../controllers/category.controller";
-import { idParamZod, validate } from "../../middlewares/validate";
+import { idZod, validate } from "../../middlewares/validate";
 import {
   createCategoryZod,
   updateCategoryZod,
@@ -10,19 +10,24 @@ const router = Router();
 
 router.use(authenticated, checkPermission(["admin", "manager"]));
 router.get("/stats", categoryController.getStats);
-router.post("/", validate(createCategoryZod), categoryController.create);
+router.post(
+  "/",
+  validate(createCategoryZod, "body"),
+  categoryController.create,
+);
 router
   .route("/:id")
   .patch(
-    validate(idParamZod),
-    validate(updateCategoryZod),
+    validate(idZod, "params"),
+    validate(updateCategoryZod, "body"),
     categoryController.update,
   )
   .delete(
     checkPermission(["admin"]),
-    validate(idParamZod),
+    validate(idZod, "params"),
     categoryController.softDelete,
   );
+
 
 export default {
   path: "/categories",

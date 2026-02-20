@@ -28,11 +28,14 @@ export const validate =
       next(error);
     }
   };
+export const idZod = z.object({
+  id: z
+    .string({ error: "ID is required" })
+    .regex(/^[0-9a-fA-F]{24}$/, "Invalid ID"),
+});
+
 export const idParamZod = z.object({
-  params: z.object({
-    id: z
-      .string({ error: "ID is required" })
-      .regex(/^[0-9a-fA-F]{24}$/, "Invalid ID"),
-  }),
+  params: idZod,
 }) satisfies z.ZodType<{ params: { id: string } }>;
 export type IdParam = z.infer<typeof idParamZod>["params"];
+

@@ -26,7 +26,7 @@ export class CategoryRepo {
   async softDelete(id: string) {
     const category = await Category.findByIdAndUpdate(
       id,
-      { status: CategoryStatusEnum.INACTIVE, deletedAt: new Date() },
+      { status: CategoryStatusEnum.ARCHIVED, deletedAt: new Date() },
       { new: true },
     );
     return category;
