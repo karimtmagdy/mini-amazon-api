@@ -15,15 +15,17 @@ export class BrandService {
       throw new ApiError("Brand name already exists", 400);
     }
 
+    // Build the full payload — image comes from req.file (Multer), not from req.body
+    const createData: Record<string, any> = { ...data };
     if (file) {
       const { url, publicId } = await cloudService.uploadSinglePhoto(
         file.path,
         "brands",
       );
       fs.unlinkSync(file.path);
-      data.image = { url, publicId };
+      createData.image = { url, publicId };
     }
-    const brand = await this.brandRepo.create(data as any);
+    const brand = await this.brandRepo.create(createData as any);
     return { brand };
   }
   async update(id: string, data: UpdateBrand, file?: Express.Multer.File) {
@@ -37,6 +39,7 @@ export class BrandService {
       }
     }
 
+    // Build the full update payload — image comes from req.file (Multer), not from req.body
     let image = exists.image;
     if (file) {
       const { url, publicId } = await cloudService.uploadSinglePhoto(
@@ -51,7 +54,7 @@ export class BrandService {
     }
     const updateData: Partial<BrandDto> = {
       ...data,
-      image,
+      ...(image ? { image } : {}),
     };
     const brand = await this.brandRepo.update(id, updateData as any);
     if (!brand) throw new ApiError("Brand not found", 404);
