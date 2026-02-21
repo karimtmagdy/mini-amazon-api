@@ -7,17 +7,24 @@ import { MiddlewareApplication } from "./middlewares/error.middlewares";
 
 const app = express();
 configApp(app);
-// Initialize Database with error handling
-const initDb = async () => {
+
+/**
+ * ✅ Serverless-safe DB middleware.
+ * Runs before every request to ensure the MongoDB connection
+ * exists (or reuses the cached one). This avoids the race
+ * condition where initDb() fires but hasn't finished by the
+ * time the first request arrives on a cold start.
+ */
+app.use(async (_req, _res, next) => {
   try {
     await Database.getInstance();
-    console.log("✅ Database initialized successfully");
+    next();
   } catch (error) {
-    console.error("❌ Database initialization failed:", error);
+    console.error("❌ Database connection failed:", error);
+    next(error);
   }
-};
+});
 
-initDb();
 setupRoutes(app);
 app.get(["/", "/health"], (_req, res) => {
   res.status(200).json({
