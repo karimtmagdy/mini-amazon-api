@@ -1,3 +1,5 @@
+import { STATUS_CODE } from "../lib/statuscode";
+
 export class ApiError extends Error {
   status: string;
   // stack?: string;
@@ -8,7 +10,7 @@ export class ApiError extends Error {
     // stack?: string,
   ) {
     super(message || "An unknown error occurred");
-    this.statusCode = statusCode || 500;
+    this.statusCode = statusCode || STATUS_CODE.SERVER_ERROR;
     const statusCodeStr = String(this.statusCode);
     this.status = statusCodeStr.startsWith("4") ? "fail" : "error";
     // this.stack = stack;

@@ -73,6 +73,13 @@ export class UserRepo {
       { new: true },
     );
   }
+  async reactivate(id: string) {
+    return await User.findByIdAndUpdate(
+      id,
+      { status: UserStatusEnum.ACTIVE },
+      { new: true },
+    );
+  }
   async unlock(id: string) {
     return await User.findByIdAndUpdate(
       id,

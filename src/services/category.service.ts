@@ -1,18 +1,18 @@
-import { ApiError } from "../class/api.error";
 import { CreateCategory, UpdateCategory } from "../schema/category.schema";
 import { CategoryRepo, categoryRepo } from "../repo/category.repo";
 import { cloudService } from "../config/cloudinary";
 import { CategoryDto } from "../contract/category.dto";
 import fs from "fs";
 import { QueryString } from "../schema/standred.schema";
+import { ErrorFactory } from "../class/error.factory";
 
 export class CategoryService {
   constructor(private readonly categoryRepo: CategoryRepo) {}
 
   async create(data: CreateCategory, file?: Express.Multer.File) {
-    const nameExists = await this.categoryRepo.findByName(data.name);
-    if (nameExists) {
-      throw new ApiError("Category name already exists", 400);
+    const exists = await this.categoryRepo.findByName(data.name);
+    if (exists) {
+      ErrorFactory.throwBadRequest("Category name already exists");
     }
 
     if (file) {
@@ -26,18 +26,22 @@ export class CategoryService {
     const category = await this.categoryRepo.create(data as any);
     return { category };
   }
-  async update(id: string, data: UpdateCategory, file?: Express.Multer.File) {
-    const exists = await this.categoryRepo.findById(id);
-    if (!exists) throw new ApiError("Category not found", 404);
+  async update(
+    categoryId: string,
+    data: UpdateCategory,
+    file?: Express.Multer.File,
+  ) {
+    const exists = await this.categoryRepo.findById(categoryId);
+    if (!exists) ErrorFactory.throwNotFound("Category not found");
 
     if (data.name) {
-      const nameExists = await this.categoryRepo.findByName(data.name);
-      if (nameExists && nameExists._id.toString() !== id) {
-        throw new ApiError("Category name already exists", 400);
+      const exists = await this.categoryRepo.findByName(data.name);
+      if (exists && exists._id.toString() !== categoryId) {
+        ErrorFactory.throwBadRequest("Category name already exists");
       }
     }
 
-    let image = exists.image;
+    let image = exists?.image;
     if (file) {
       const { url, publicId } = await cloudService.uploadSinglePhoto(
         file.path,
@@ -45,7 +49,7 @@ export class CategoryService {
       );
       fs.unlinkSync(file.path);
       image = { url, publicId };
-      if (exists.image?.publicId) {
+      if (exists?.image?.publicId) {
         await cloudService.deletePhoto(exists.image.publicId);
       }
     }
@@ -53,18 +57,21 @@ export class CategoryService {
       ...data,
       image,
     };
-    const category = await this.categoryRepo.update(id, updateData as any);
-    if (!category) throw new ApiError("Category not found", 404);
+    const category = await this.categoryRepo.update(
+      categoryId,
+      updateData as any,
+    );
+    if (!category) ErrorFactory.throwNotFound("Category not found");
     return { category };
   }
-  async softDelete(id: string) {
-    const category = await this.categoryRepo.softDelete(id);
-    if (!category) throw new ApiError("Category not found", 404);
+  async softDelete(categoryId: string) {
+    const category = await this.categoryRepo.softDelete(categoryId);
+    if (!category) ErrorFactory.throwNotFound("Category not found");
     return { category };
   }
-  async findById(id: string) {
-    const category = await this.categoryRepo.findById(id);
-    if (!category) throw new ApiError("Category not found", 404);
+  async findById(categoryId: string) {
+    const category = await this.categoryRepo.findById(categoryId);
+    if (!category) ErrorFactory.throwNotFound("Category not found");
     return { category };
   }
   async findAll(query: QueryString) {

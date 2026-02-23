@@ -3,6 +3,7 @@ import publicRoutes from "./public";
 import adminRoutes from "./admin";
 import type { Express } from "express";
 
+// Prefixed Routes
 const RV1 = "/api/v1";
 export const setupRoutes = (app: Express) => {
   publicRoutes.forEach((route: Route) => {

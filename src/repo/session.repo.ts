@@ -28,6 +28,32 @@ export class SessionRepository {
       refreshToken: { $ne: currentToken },
     });
   }
+  //   async updateResetPasswordToken(
+  //   email: string,
+  //   token: string,
+  //   expiresAt: Date,
+  // ) {
+  //   const user = await User.findOneAndUpdate(
+  //     { email },
+  //     { resetPasswordToken: token, resetPasswordExpireAt: expiresAt },
+  //     { new: true },
+  //   );
+  //   return user;
+  // }
+  // async findByResetToken(token: string) {
+  //   const user = await User.findOne({
+  //     resetPasswordToken: token,
+  //     resetPasswordExpireAt: { $gt: Date.now() },
+  //   });
+  //   return user;
+  // }
+
+  // async clearResetToken(userId: string) {
+  //   const user = await User.findByIdAndUpdate(userId, {
+  //     $unset: { resetPasswordToken: 1, resetPasswordExpireAt: 1 },
+  //   });
+  //   return user;
+  // }
 }
 
 export const sessionRepo = new SessionRepository();

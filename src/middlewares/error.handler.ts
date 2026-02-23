@@ -3,6 +3,7 @@ import { env } from "../lib/env";
 import { z } from "zod";
 import { Error as MongooseError } from "mongoose";
 import { ApiError } from "../class/api.error";
+import { STATUS_CODE } from "../lib/statuscode";
 
 export function errorHandler(
   err: any,
@@ -10,10 +11,10 @@ export function errorHandler(
   res: Response,
   _next: NextFunction,
 ) {
-  const statusCode = err.statusCode || 500;
+  const statusCode = err.statusCode || STATUS_CODE.SERVER_ERROR;
   const message = err.message || "Internal Server Error";
 
-  if (statusCode >= 400) {
+  if (statusCode >= STATUS_CODE.BAD_REQUEST) {
     console.error("❌ ERROR:", {
       status: err.status,
       statusCode,
@@ -23,10 +24,9 @@ export function errorHandler(
     });
   }
 
-
   // 2. Mongoose Cast Error (Invalid ID, etc.)
   if (err instanceof MongooseError.CastError || err.name === "CastError") {
-    return res.status(400).json({
+    return res.status(STATUS_CODE.BAD_REQUEST).json({
       status: "fail",
       message: `Invalid ${err.path}: ${err.value}`,
     });
@@ -34,10 +34,12 @@ export function errorHandler(
 
   // 3. Known App Error
   if (err instanceof ApiError || (err as any).isOperational) {
-    return res.status((err as any).statusCode || 500).json({
-      status: "fail",
-      message: err.message,
-    });
+    return res
+      .status((err as any).statusCode || STATUS_CODE.SERVER_ERROR)
+      .json({
+        status: "fail",
+        message: err.message,
+      });
   }
 
   // 4. Mongoose Duplicate Key Error
@@ -45,7 +47,7 @@ export function errorHandler(
     const field = err.keyValue
       ? Object.keys(err.keyValue)[0] || "field"
       : "field";
-    return res.status(400).json({
+    return res.status(STATUS_CODE.BAD_REQUEST).json({
       status: "fail",
       message: `${field} already exists`,
     });
@@ -58,7 +60,7 @@ export function errorHandler(
       message: issue.message,
     }));
     const summaryMessage = err.issues[0]?.message || "Validation Error";
-    return res.status(400).json({
+    return res.status(STATUS_CODE.BAD_REQUEST).json({
       status: "fail",
       message: summaryMessage,
       errors: formattedErrors,

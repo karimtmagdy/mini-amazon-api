@@ -1,30 +1,32 @@
-import { ApiError } from "../class/api.error";
 import { ProductRepo, productRepo } from "../repo/product.repo";
 import { CreateProduct } from "../schema/product.schema";
 import { QueryString } from "../schema/standred.schema";
+import { ErrorFactory } from "../class/error.factory";
 
 export class ProductService {
   constructor(private readonly productRepo: ProductRepo) {}
   async create(data: CreateProduct) {
+    const exists = await this.productRepo.findById(data.name);
+    if (exists) ErrorFactory.throwBadRequest("Product name already exists");
     const product = await this.productRepo.create(data);
     return { product };
   }
-  async update(id: string, data: CreateProduct) {
-    const exists = await this.productRepo.findById(id);
-    if (!exists) throw new ApiError("Product not found", 404);
-    const product = await this.productRepo.findByIdAndUpdate(id, data);
+  async update(productId: string, data: CreateProduct) {
+    const exists = await this.productRepo.findById(productId);
+    if (!exists) ErrorFactory.throwNotFound("Product not found");
+    const product = await this.productRepo.findByIdAndUpdate(productId, data);
     return { product };
   }
-  async delete(id: string) {
-    const exists = await this.productRepo.findById(id);
-    if (!exists) throw new ApiError("Product not found", 404);
-    const product = await this.productRepo.findByIdAndDelete(id);
+  async delete(productId: string) {
+    const exists = await this.productRepo.findById(productId);
+    if (!exists) ErrorFactory.throwNotFound("Product not found");
+    const product = await this.productRepo.findByIdAndDelete(productId);
     return { product };
   }
-  async findById(id: string) {
-    const exists = await this.productRepo.findById(id);
-    if (!exists) throw new ApiError("Product not found", 404);
-    const product = await this.productRepo.findById(id);
+  async findById(productId: string) {
+    const exists = await this.productRepo.findById(productId);
+    if (!exists) ErrorFactory.throwNotFound("Product not found");
+    const product = await this.productRepo.findById(productId);
     return { product };
   }
   async findAll(query: QueryString) {

@@ -1,45 +1,48 @@
-import { ApiError } from "../class/api.error";
 import {
   CreateSubCategory,
   UpdateSubCategory,
 } from "../schema/subcategory.schema";
 import { SubCategoryRepo, subCategoryRepo } from "../repo/subcategory.repo";
 import { QueryString } from "../schema/standred.schema";
+import { ErrorFactory } from "../class/error.factory";
 
 export class SubCategoryService {
   constructor(private readonly subCategoryRepo: SubCategoryRepo) {}
 
   async create(data: CreateSubCategory) {
-    const nameExists = await this.subCategoryRepo.findByName(data.name);
-    if (nameExists) {
-      throw new ApiError("Subcategory name already exists", 400);
+    const exists = await this.subCategoryRepo.findByName(data.name);
+    if (exists) {
+      ErrorFactory.throwBadRequest("Subcategory name already exists");
     }
     const subCategory = await this.subCategoryRepo.create(data as any);
     return { subCategory };
   }
-  async update(id: string, data: UpdateSubCategory) {
-    const exists = await this.subCategoryRepo.findById(id);
-    if (!exists) throw new ApiError("subCategory not found", 404);
+  async update(subCategoryId: string, data: UpdateSubCategory) {
+    const exists = await this.subCategoryRepo.findById(subCategoryId);
+    if (!exists) ErrorFactory.throwNotFound("subCategory not found");
 
     if (data.name) {
-      const nameExists = await this.subCategoryRepo.findByName(data.name);
-      if (nameExists && nameExists._id.toString() !== id) {
-        throw new ApiError("Subcategory name already exists", 400);
+      const exists = await this.subCategoryRepo.findByName(data.name);
+      if (exists && exists._id.toString() !== subCategoryId) {
+        ErrorFactory.throwBadRequest("Subcategory name already exists");
       }
     }
 
-    const subCategory = await this.subCategoryRepo.update(id, data as any);
-    if (!subCategory) throw new ApiError("subCategory not found", 404);
+    const subCategory = await this.subCategoryRepo.update(
+      subCategoryId,
+      data as any,
+    );
+    if (!subCategory) ErrorFactory.throwNotFound("subCategory not found");
     return { subCategory };
   }
-  async delete(id: string) {
-    const subCategory = await this.subCategoryRepo.delete(id);
-    if (!subCategory) throw new ApiError("subCategory not found", 404);
+  async delete(subCategoryId: string) {
+    const subCategory = await this.subCategoryRepo.delete(subCategoryId);
+    if (!subCategory) ErrorFactory.throwNotFound("subCategory not found");
     return { subCategory };
   }
-  async findById(id: string) {
-    const subCategory = await this.subCategoryRepo.findById(id);
-    if (!subCategory) throw new ApiError("subCategory not found", 404);
+  async findById(subCategoryId: string) {
+    const subCategory = await this.subCategoryRepo.findById(subCategoryId);
+    if (!subCategory) ErrorFactory.throwNotFound("subCategory not found");
     return { subCategory };
   }
   async findAll(query: QueryString) {

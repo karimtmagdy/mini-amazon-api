@@ -14,5 +14,4 @@ export type CategoryDto = At & {
   slug: string;
   status: CategoryStatus;
   products: number;
-  deletedAt: Date | null;
 };

@@ -1,18 +1,18 @@
-import { ApiError } from "../class/api.error";
 import { cloudService } from "../config/cloudinary";
 import { BrandDto } from "../contract/brand.dto";
 import { CreateBrand, UpdateBrand } from "../schema/brand.schema";
 import { BrandRepo, brandRepo } from "../repo/brand.repo";
 import { QueryString } from "../schema/standred.schema";
 import fs from "fs";
+import { ErrorFactory } from "../class/error.factory";
 
 export class BrandService {
   constructor(private readonly brandRepo: BrandRepo) {}
 
   async create(data: CreateBrand, file?: Express.Multer.File) {
-    const nameExists = await this.brandRepo.findByName(data.name);
-    if (nameExists) {
-      throw new ApiError("Brand name already exists", 400);
+    const exists = await this.brandRepo.findByName(data.name);
+    if (exists) {
+      ErrorFactory.throwBadRequest("Brand name already exists");
     }
 
     // Build the full payload — image comes from req.file (Multer), not from req.body
@@ -28,19 +28,19 @@ export class BrandService {
     const brand = await this.brandRepo.create(createData as any);
     return { brand };
   }
-  async update(id: string, data: UpdateBrand, file?: Express.Multer.File) {
-    const exists = await this.brandRepo.findById(id);
-    if (!exists) throw new ApiError("Brand not found", 404);
+  async update(brandId: string, data: UpdateBrand, file?: Express.Multer.File) {
+    const exists = await this.brandRepo.findById(brandId);
+    if (!exists) ErrorFactory.throwNotFound("Brand not found");
 
     if (data.name) {
-      const nameExists = await this.brandRepo.findByName(data.name);
-      if (nameExists && nameExists._id.toString() !== id.toString()) {
-        throw new ApiError("Brand name already exists", 400);
+      const exists = await this.brandRepo.findByName(data.name);
+      if (exists && exists._id.toString() !== brandId.toString()) {
+        ErrorFactory.throwBadRequest("Brand name already exists");
       }
     }
 
     // Build the full update payload — image comes from req.file (Multer), not from req.body
-    let image = exists.image;
+    let image = exists?.image;
     if (file) {
       const { url, publicId } = await cloudService.uploadSinglePhoto(
         file.path,
@@ -48,7 +48,7 @@ export class BrandService {
       );
       fs.unlinkSync(file.path);
       image = { url, publicId };
-      if (exists.image?.publicId) {
+      if (exists?.image?.publicId) {
         await cloudService.deletePhoto(exists.image.publicId);
       }
     }
@@ -56,18 +56,18 @@ export class BrandService {
       ...data,
       ...(image ? { image } : {}),
     };
-    const brand = await this.brandRepo.update(id, updateData as any);
-    if (!brand) throw new ApiError("Brand not found", 404);
+    const brand = await this.brandRepo.update(brandId, updateData as any);
+    if (!brand) ErrorFactory.throwNotFound("Brand not found");
     return { brand };
   }
-  async softDelete(id: string) {
-    const brand = await this.brandRepo.softDelete(id);
-    if (!brand) throw new ApiError("Brand not found", 404);
+  async softDelete(brandId: string) {
+    const brand = await this.brandRepo.softDelete(brandId);
+    if (!brand) ErrorFactory.throwNotFound("Brand not found");
     return { brand };
   }
-  async findById(id: string) {
-    const brand = await this.brandRepo.findById(id);
-    if (!brand) throw new ApiError("Brand not found", 404);
+  async findById(brandId: string) {
+    const brand = await this.brandRepo.findById(brandId);
+    if (!brand) ErrorFactory.throwNotFound("Brand not found");
     return { brand };
   }
   async findAll(query: QueryString) {

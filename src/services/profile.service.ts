@@ -1,8 +1,9 @@
-import { ApiError } from "../class/api.error";
 import { UserRepo, userRepo } from "../repo/user.repo";
 import { UpdateUserProfile } from "../schema/user.schema";
 import { cloudService } from "../config/cloudinary";
 import fs from "fs";
+import { ErrorFactory } from "../class/error.factory";
+import { UserRoleEnum } from "../contract/user.dto";
 /**
  * Design Pattern: Service Layer
  * Purpose: Handles user-related business logic and operations.
@@ -12,7 +13,7 @@ export class ProfileService {
   constructor(protected userRepo: UserRepo) {}
   async getHimself(userId: string) {
     const user = await this.userRepo.findById(userId);
-    if (!user) throw new ApiError("User not found", 404);
+    if (!user) ErrorFactory.throwNotFound("User not found");
     return { user };
   }
   async updateUserHimself(
@@ -33,13 +34,13 @@ export class ProfileService {
       fs.unlinkSync(file.path);
     }
     const user = await this.userRepo.update(userId, data);
-    if (!user) throw new ApiError("User not found", 404);
+    if (!user) ErrorFactory.throwNotFound("User not found");
     return { user };
   }
   async deleteImage(userId: string) {
     const data = await this.userRepo.findById(userId);
-    if (!data) throw new ApiError("User not found", 404);
-    if (data.image?.publicId) {
+    if (!data) ErrorFactory.throwNotFound("User not found");
+    if (data?.image?.publicId) {
       await cloudService.deletePhoto(data.image.publicId);
     }
     const user = await this.userRepo.update(userId, { image: null });
@@ -47,17 +48,17 @@ export class ProfileService {
   }
   async deactivateAccount(userId: string) {
     const data = await this.userRepo.findById(userId);
-    if (!data) throw new ApiError("User not found", 404);
-    if (data.role === "admin")
-      throw new ApiError("You cannot deactivate yourself", 400);
+    if (!data) ErrorFactory.throwNotFound("User not found");
+    if (data?.role === UserRoleEnum.ADMIN)
+      ErrorFactory.throwBadRequest("You cannot deactivate yourself");
     const user = await this.userRepo.deactivate(userId);
     return { user };
   }
   async deleteHimself(userId: string) {
     const data = await this.userRepo.findById(userId);
-    if (!data) throw new ApiError("User not found", 404);
-    if (data.role === "admin")
-      throw new ApiError("You cannot delete yourself", 400);
+    if (!data) ErrorFactory.throwNotFound("User not found");
+    if (data?.role === UserRoleEnum.ADMIN)
+      ErrorFactory.throwBadRequest("You cannot delete yourself");
     const user = await this.userRepo.softDelete(userId);
     return { user };
   }

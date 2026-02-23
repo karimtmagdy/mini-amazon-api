@@ -9,7 +9,6 @@ export enum SubCategoryStatusEnum {
   ARCHIVED = "archived",
 }
 
-
 export type SubCategoryDto = At & {
   name: string;
   slug: string;
@@ -17,7 +16,4 @@ export type SubCategoryDto = At & {
   category: (Types.ObjectId | string)[];
   products: number;
   status: SubCategoryStatus;
-
 };
-
-

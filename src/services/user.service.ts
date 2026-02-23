@@ -1,9 +1,10 @@
-import { ApiError } from "../class/api.error";
 import { UserRepo, userRepo } from "../repo/user.repo";
 import { QueryString } from "../schema/standred.schema";
 import { CreateUser, UpdateUser } from "../schema/user.schema";
 // import { cloudService } from "../config/cloudinary";
 // import fs from "fs";
+import { UserRoleEnum } from "../contract/user.dto";
+import { ErrorFactory } from "../class/error.factory";
 /**
  * Design Pattern: Service Layer
  * Purpose: Handles user-related business logic and operations.
@@ -11,14 +12,14 @@ import { CreateUser, UpdateUser } from "../schema/user.schema";
  */
 export class UserService {
   constructor(protected userRepo: UserRepo) {}
-  async getUserById(id: string) {
-    const user = await this.userRepo.findById(id);
-    if (!user) throw new ApiError("User not found", 404);
+  async getUserById(userId: string) {
+    const user = await this.userRepo.findById(userId);
+    if (!user) ErrorFactory.throwNotFound("User not found");
     return { user };
   }
   async createByAdmin(data: CreateUser) {
     const exists = await this.userRepo.findByEmail(data.email);
-    if (exists) throw new ApiError("User already exists", 400);
+    if (exists) ErrorFactory.throwBadRequest("User already exists");
     const user = await this.userRepo.create(data);
     return { user };
   }
@@ -28,63 +29,99 @@ export class UserService {
   }
   async update(userId: string, data: UpdateUser) {
     const exists = await this.userRepo.findById(userId);
-    if (!exists) throw new ApiError("User not found", 404);
+    if (!exists) ErrorFactory.throwNotFound("User not found");
     const user = await this.userRepo.update(userId, data);
     return { user };
   }
-  async changeRole(id: string, role: string) {
-    const data = await this.userRepo.findById(id);
-    if (!data) throw new ApiError("User not found", 404);
-    if (data.role === "admin")
-      throw new ApiError("You cannot change admin role", 400);
-    const user = await this.userRepo.changeRole(id, role);
+  async changeRole(userId: string, role: string) {
+    const data = await this.userRepo.findById(userId);
+    if (!data) ErrorFactory.throwNotFound("User not found");
+    if (data?.role === UserRoleEnum.ADMIN)
+      ErrorFactory.throwBadRequest("You cannot change admin role");
+    const user = await this.userRepo.changeRole(userId, role);
     return { user };
   }
-  async updateStatus(id: string, status: string) {
-    const data = await this.userRepo.findById(id);
-    if (!data) throw new ApiError("User not found", 404);
-    const user = await this.userRepo.updateStatus(id, status);
+  async updateStatusByAdmin(userId: string, status: string) {
+    const data = await this.userRepo.findById(userId);
+    if (!data) ErrorFactory.throwNotFound("User not found");
+    if (data?.role === UserRoleEnum.ADMIN)
+      ErrorFactory.throwBadRequest("You cannot change admin status");
+    const user = await this.userRepo.updateStatus(userId, status);
     return { user };
   }
   async unlockByAdmin(userId: string) {
     const data = await this.userRepo.findById(userId);
-    if (!data) throw new ApiError("User not found", 404);
+    if (!data) ErrorFactory.throwNotFound("User not found");
     const user = await this.userRepo.unlock(userId);
     return { user };
   }
   async deactivateByAdmin(userId: string) {
     const data = await this.userRepo.findById(userId);
-    if (!data) throw new ApiError("User not found", 404);
-    if (data.role === "admin")
-      throw new ApiError("You cannot deactivate admin", 400);
-    if (userId === data.id)
-      throw new ApiError("You cannot deactivate yourself", 400);
+    if (!data) ErrorFactory.throwNotFound("User not found");
+    if (data?.role === UserRoleEnum.ADMIN)
+      ErrorFactory.throwBadRequest("You cannot deactivate admin");
+    if (userId === data?.id)
+      ErrorFactory.throwBadRequest("You cannot deactivate yourself");
     const user = await this.userRepo.deactivate(userId);
     return { user };
   }
-  // async reactivateByAdmin(userId: string) {
-  //   const user = await this.userRepo.findById(userId);
-  //   if (!user) throw new ApiError("User not found", 404);
-  //   const data = await this.userRepo.reactivate(userId);
-  //   return { data };
-  // }
-  async softDeleteByAdmin(id: string) {
-    const data = await this.userRepo.findById(id);
-    if (!data) throw new ApiError("User not found", 404);
-    if (data.role === "admin")
-      throw new ApiError(
+  async reactivateByAdmin(userId: string) {
+    const data = await this.userRepo.findById(userId);
+    if (!data) ErrorFactory.throwNotFound("User not found");
+    const user = await this.userRepo.reactivate(userId);
+    return { user };
+  }
+  async softDeleteByAdmin(userId: string) {
+    const data = await this.userRepo.findById(userId);
+    if (!data) ErrorFactory.throwNotFound("User not found");
+    if (data?.role === UserRoleEnum.ADMIN)
+      ErrorFactory.throwBadRequest(
         "Administrators cannot delete their own accounts",
-        400,
       );
-    // if (id === user.id) throw new ApiError("You cannot delete yourself", 400);
-    const user = await this.userRepo.softDelete(id);
+    if (userId === data?.id)
+      ErrorFactory.throwBadRequest("You cannot delete yourself");
+    const user = await this.userRepo.softDelete(userId);
     return { user };
   }
   async deleteBulk(userIds: string[]) {
-    if (userIds.length === 0) throw new ApiError("No users found", 404);
+    if (userIds.length === 0) ErrorFactory.throwNotFound("No users found");
     const users = await this.userRepo.deleteBulk(userIds);
     return { users };
   }
 }
 
 export const userService = new UserService(userRepo);
+// async updateStatusByAdmin(
+//     userId: string,
+//     adminId: string,
+//     user: UpdateStatus,
+//   ) {
+//     if (!userId) throw new ApiError("User not found", 404);
+//     // Use specialized methods for side-effects
+//     if (user.status === "deactivated")
+//       return this.deactivateUserByAdmin(userId, adminId);
+//     if (user.status === "deleted")
+//       return this.deletionService.deleteUserByAdmin(userId, adminId);
+//     if (user.status === "active")
+//       return this.reactivateUserByAdmin(userId, adminId);
+//     // Prevent admin from changing their own status to restrictive states via generic update
+//     const restrictiveStatuses: string[] = [
+//       "locked",
+//       "banned",
+//       "deactivated",
+//       "deleted",
+//       "inactive",
+//     ];
+//     if (adminId === userId && restrictiveStatuses.includes(user.status)) {
+//       throw new ApiError(
+//         `You cannot change your own status to ${user.status}`,
+//         400,
+//       );
+//     }
+//     const data = await this.userRepository.updateStatus(
+//       userId,
+//       user.status,
+//       adminId,
+//     );
+//     return { data };
+//   }
