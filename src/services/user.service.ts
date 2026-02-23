@@ -1,4 +1,5 @@
 import { UserRepo, userRepo } from "../repo/user.repo";
+import { notifyService, NotifyService } from "./notify.service";
 import { QueryString } from "../schema/standred.schema";
 import { CreateUser, UpdateUser } from "../schema/user.schema";
 // import { cloudService } from "../config/cloudinary";
@@ -11,7 +12,10 @@ import { ErrorFactory } from "../class/error.factory";
  * Responsibilities: User data retrieval, validation, and coordination with user repository.
  */
 export class UserService {
-  constructor(protected userRepo: UserRepo) {}
+  constructor(
+    protected userRepo: UserRepo,
+    private notifyService: NotifyService,
+  ) {}
   async getUserById(userId: string) {
     const user = await this.userRepo.findById(userId);
     if (!user) ErrorFactory.throwNotFound("User not found");
@@ -21,6 +25,7 @@ export class UserService {
     const exists = await this.userRepo.findByEmail(data.email);
     if (exists) ErrorFactory.throwBadRequest("User already exists");
     const user = await this.userRepo.create(data);
+    await this.notifyService.sendWelcomeEmail(user.email, user.username);
     return { user };
   }
   async getAll(query: QueryString) {
@@ -36,31 +41,52 @@ export class UserService {
   async changeRole(userId: string, role: string) {
     const data = await this.userRepo.findById(userId);
     if (!data) ErrorFactory.throwNotFound("User not found");
-    if (data?.role === UserRoleEnum.ADMIN)
+    if (data.role === UserRoleEnum.ADMIN)
       ErrorFactory.throwBadRequest("You cannot change admin role");
     const user = await this.userRepo.changeRole(userId, role);
+    if (user) {
+      await this.notifyService.sendRoleChangeNotification(
+        user.email,
+        user.username,
+        role,
+      );
+    }
     return { user };
   }
   async updateStatusByAdmin(userId: string, status: string) {
     const data = await this.userRepo.findById(userId);
     if (!data) ErrorFactory.throwNotFound("User not found");
-    if (data?.role === UserRoleEnum.ADMIN)
+    if (data.role === UserRoleEnum.ADMIN)
       ErrorFactory.throwBadRequest("You cannot change admin status");
     const user = await this.userRepo.updateStatus(userId, status);
+    if (user) {
+      await this.notifyService.sendAccountStatusNotification(
+        user.email,
+        user.username,
+        status,
+      );
+    }
     return { user };
   }
   async unlockByAdmin(userId: string) {
     const data = await this.userRepo.findById(userId);
     if (!data) ErrorFactory.throwNotFound("User not found");
     const user = await this.userRepo.unlock(userId);
+    if (user) {
+      await this.notifyService.sendAccountStatusNotification(
+        user.email,
+        user.username,
+        "Active (Unlocked)",
+      );
+    }
     return { user };
   }
   async deactivateByAdmin(userId: string) {
     const data = await this.userRepo.findById(userId);
     if (!data) ErrorFactory.throwNotFound("User not found");
-    if (data?.role === UserRoleEnum.ADMIN)
+    if (data.role === UserRoleEnum.ADMIN)
       ErrorFactory.throwBadRequest("You cannot deactivate admin");
-    if (userId === data?.id)
+    if (userId === data.id)
       ErrorFactory.throwBadRequest("You cannot deactivate yourself");
     const user = await this.userRepo.deactivate(userId);
     return { user };
@@ -74,11 +100,11 @@ export class UserService {
   async softDeleteByAdmin(userId: string) {
     const data = await this.userRepo.findById(userId);
     if (!data) ErrorFactory.throwNotFound("User not found");
-    if (data?.role === UserRoleEnum.ADMIN)
+    if (data.role === UserRoleEnum.ADMIN)
       ErrorFactory.throwBadRequest(
         "Administrators cannot delete their own accounts",
       );
-    if (userId === data?.id)
+    if (userId === data.id)
       ErrorFactory.throwBadRequest("You cannot delete yourself");
     const user = await this.userRepo.softDelete(userId);
     return { user };
@@ -90,7 +116,7 @@ export class UserService {
   }
 }
 
-export const userService = new UserService(userRepo);
+export const userService = new UserService(userRepo, notifyService);
 // async updateStatusByAdmin(
 //     userId: string,
 //     adminId: string,

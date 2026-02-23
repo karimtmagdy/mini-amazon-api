@@ -85,11 +85,19 @@ export const registerUserZod = defaultUserZod.shape.body
     path: ["confirmPassword"],
   });
 
-export const resetPasswordZod = defaultUserZod.shape.body
-  .pick({
-    password: true,
-  })
-  .extend({
+export const resetPasswordZod = z
+  .object({
+    email: z
+      .string({ message: "Email is required" })
+      .email({ message: "Invalid email format" })
+      .optional(),
+    otp: z
+      .string({ message: "OTP code is required" })
+      .length(6, { message: "OTP must be 6 digits" })
+      .optional(),
+    password: z
+      .string({ message: "Password is required" })
+      .min(6, { message: "Password must be at least 6 characters" }),
     confirmPassword: z.string({ message: "Confirm password is required" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -122,3 +130,15 @@ export type UpdateUserRole = z.infer<typeof changeRoleZod>;
 export type UpdateUserProfile = z.infer<typeof updateProfileZod>;
 export type ForgotPassword = z.infer<typeof forgotPasswordZod>;
 export type ResetPassword = z.infer<typeof resetPasswordZod>;
+
+export const verify2FAZod = z.object({
+  token: z.string().length(6, "Token must be 6 digits"),
+});
+
+export const loginWith2FAZod = z.object({
+  loginToken: z.string(),
+  token2FA: z.string().length(6, "Token must be 6 digits"),
+});
+
+export type Verify2FA = z.infer<typeof verify2FAZod>;
+export type LoginWith2FA = z.infer<typeof loginWith2FAZod>;

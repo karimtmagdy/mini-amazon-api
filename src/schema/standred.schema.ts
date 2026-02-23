@@ -61,18 +61,8 @@ export const responseZod = baseResponseZod.extend({
   data: z.unknown(),
 });
 export type ResponseZod<T> = Omit<z.infer<typeof responseZod>, "data"> & {
-  data: T;
+  data?: T;
 };
-// export const sendResponse = <T>(
-//   res: Response,
-//   schema: z.ZodSchema,
-//   payload: T,
-//   // message:string
-// ) => {
-//   const validated = schema.parse(payload);
-//   return res.json(validated);
-// };
-
 export const multipleBulkDeleteZod = z.object({
   body: z.object({
     ids: z

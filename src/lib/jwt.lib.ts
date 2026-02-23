@@ -51,16 +51,26 @@ class JWT {
   //   verifyCartToken(token: string): CartPayload {
   //     return this.verify<CartPayload>(token, jwtConfig.cartSecret as Secret);
   //   }
-  //   generateResetToken(payload: ResetPayload): string {
-  //     return this.sign(
-  //       payload,
-  //       jwtConfig.resetSecret as Secret,
-  //       jwtConfig.resetExpiresIn as StringValue,
-  //     );
-  //   }
-  //   verifyResetToken(token: string): ResetPayload {
-  //     return this.verify<ResetPayload>(token, jwtConfig.resetSecret as Secret);
-  //   }
+  generateResetToken(payload: IdPayload): string {
+    return this.sign(
+      payload,
+      env.resetSecret as Secret,
+      "15m" as StringValue,
+    );
+  }
+  verifyResetToken(token: string): IdPayload {
+    return this.verify<IdPayload>(token, env.resetSecret as Secret);
+  }
+  generateVerificationToken(payload: IdPayload): string {
+    return this.sign(
+      payload,
+      env.accessToken as Secret, // Using accessToken secret for simplicity or dedicated secret if available
+      "24h" as StringValue,
+    );
+  }
+  verifyVerificationToken(token: string): IdPayload {
+    return this.verify<IdPayload>(token, env.accessToken as Secret);
+  }
 }
 
 export const jwtUitl = new JWT();

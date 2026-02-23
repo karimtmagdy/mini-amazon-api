@@ -68,26 +68,34 @@ const UserSchema = new Schema<UserDto>(
       },
       publicId: { type: String, trim: true, default: null },
     },
-    // remember: { type: Boolean, default: false, select: false },
     status: { type: String, enum: USER_ACCOUNT_STATUS, default: "active" },
     activeAt: { type: Date, select: false },
     logoutAt: { type: Date, select: false },
     state: { type: String, enum: USER_STATE, default: "offline" },
     lockedUntil: { type: Date, select: false },
-    // failedLoginAttempts: { type: Number, default: 0, select: false },
+    failedLoginAttempts: { type: Number, default: 0, select: false },
     role: { type: String, enum: USER_ROLES, default: "user" },
+
+    passwordChangedAt: { type: Date },
+    verifiedAt: { type: Date },
+    verifyOtp: {
+      code: { type: String, select: false },
+      expiresAt: { type: Date, select: false },
+    },
+    resetOtp: {
+      code: { type: String, select: false },
+      expiresAt: { type: Date, select: false },
+    },
+    twoFactorEnabled: { type: Boolean, default: false },
+    twoFactorSecret: { type: String, select: false },
+    deletedAt: { type: Date, select: false },
     // cart: [
     //   {
     //     type: { type: String },
     //     productId: { type: Types.ObjectId, ref: "Product" },
     //   },
     // ],
-    // resetPasswordExpireAt: { type: Date, select: false },
-    // resetPasswordToken: { type: String, select: false },
     // wishlist: [{ type: Schema.Types.ObjectId, ref: "Wishlist", select: false }],
-    // verified: { type: Boolean, default: false, select: false },
-    // verifiedAt: { type: Date, select: false },
-    deletedAt: { type: Date, select: false },
   },
   {
     timestamps: true,
@@ -111,6 +119,11 @@ UserSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+
+  // Update passwordChangedAt field
+  if (!this.isNew) {
+    this.passwordChangedAt = new Date();
+  }
 });
 UserSchema.methods.comparePassword = async function (
   candidatePassword: string,

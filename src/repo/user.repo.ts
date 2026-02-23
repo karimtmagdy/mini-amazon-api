@@ -3,7 +3,7 @@ import { User } from "../models/user.model";
 import { DEFAULT_USER_IMAGE } from "../contract/global.dto";
 import { QueryString } from "../schema/standred.schema";
 import { APIFeatures } from "../class/api.feature";
-import { UserStatusEnum } from "../contract/user.dto";
+import { UserAccountStatusEnum } from "../contract/user.dto";
 // import { CreateUser } from "../schemas/user.schema";
 
 /**
@@ -13,7 +13,9 @@ import { UserStatusEnum } from "../contract/user.dto";
  */
 export class UserRepo {
   async findByEmail(email: string) {
-    return await User.findOne({ email }).select("+password");
+    return await User.findOne({ email }).select(
+      "+password +failedLoginAttempts +lockedUntil +resetOtp.code +resetOtp.expiresAt",
+    );
   }
   async findById(id: string) {
     return await User.findById(id);
@@ -42,7 +44,7 @@ export class UserRepo {
     return await User.findByIdAndUpdate(
       id,
       {
-        status: UserStatusEnum.ARCHIVED,
+        status: UserAccountStatusEnum.ARCHIVED,
         deletedAt: new Date(),
         image: {
           secureUrl: DEFAULT_USER_IMAGE,
@@ -69,14 +71,14 @@ export class UserRepo {
   async deactivate(id: string) {
     return await User.findByIdAndUpdate(
       id,
-      { status: UserStatusEnum.DEACTIVATED },
+      { status: UserAccountStatusEnum.DEACTIVATED },
       { new: true },
     );
   }
   async reactivate(id: string) {
     return await User.findByIdAndUpdate(
       id,
-      { status: UserStatusEnum.ACTIVE },
+      { status: UserAccountStatusEnum.ACTIVE },
       { new: true },
     );
   }
@@ -84,7 +86,7 @@ export class UserRepo {
     return await User.findByIdAndUpdate(
       id,
       {
-        status: UserStatusEnum.ACTIVE,
+        status: UserAccountStatusEnum.ACTIVE,
         lockedUntil: null,
         failedLoginAttempts: 0,
       },
@@ -94,26 +96,9 @@ export class UserRepo {
   async deleteBulk(ids: string[]) {
     return await User.updateMany(
       { id: { $in: ids } },
-      { status: UserStatusEnum.ARCHIVED, deletedAt: new Date() },
+      { status: UserAccountStatusEnum.ARCHIVED, deletedAt: new Date() },
     );
   }
 }
 export const userRepo = new UserRepo();
-// async findAll(query: { includeDeleted?: boolean; status?: string } = {}) {
-//   // const apiFeature = new ApiFeature(User.find(), query);
-//   // apiFeature.filter().sort().fields().search().pagination();
-//   const filter: any = {};
-
-//   if (query.status) {
-//     filter.status = query.status;
-//   } else if (!query.includeDeleted) {
-//     filter.status = { $ne: "deleted" };
-//     filter.deletedAt = { $exists: false };
-//   }
-//   return await User.find(filter)
-//     .select(
-//       "+presence +lockedUntil +failedLoginAttempts +createdBy +updatedBy +deletedBy",
-//     )
-//     .populate("createdBy updatedBy deletedBy", "username email name image")
-//     .sort({ createdAt: -1 });
-// }
+ 

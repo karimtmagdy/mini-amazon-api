@@ -94,7 +94,7 @@ export class UserController {
   updateStatusByAdmin = catchError(async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
     const validatedData = req.body; //as UpdateUserStatus;
-    const { user } = await this.userService.updateStatus(id, validatedData);
+    const { user } = await this.userService.updateStatusByAdmin(id, validatedData);
     return res.status(200).json({
       status: "success",
       message: "user status has been updated",

@@ -4,17 +4,16 @@ import ms from "ms";
 import { SessionRepository, sessionRepo } from "../repo/session.repo";
 import type { DeviceInfo, TokenPayload } from "../contract/sessions.dto";
 import { jwtUitl } from "../lib/jwt.lib";
-// import type { Document } from "mongoose";
-// import type { UserDto } from "../contract/user.dto";
 import { env } from "../lib/env";
-import { emailService, EmailService } from "./email.service";
+import { notifyService, NotifyService } from "./notify.service";
 import {
   UserAccountStatusEnum,
   UserRoleEnum,
   UserStateEnum,
 } from "../contract/user.dto";
-import { template } from "../lib/template/template.html";
-import { ErrorFactory, ErrorFactory } from "../class/error.factory";
+import { ErrorFactory } from "../class/error.factory";
+import speakeasy from "speakeasy";
+import qrcode from "qrcode";
 
 /**
  * Design Pattern: Service Layer + Strategy Pattern
@@ -24,7 +23,7 @@ import { ErrorFactory, ErrorFactory } from "../class/error.factory";
 export class AuthService {
   constructor(
     protected userRepo: UserRepo,
-    private emailService: EmailService,
+    private notifyService: NotifyService,
     private sessionRepo: SessionRepository,
   ) {}
   async register(username: string, email: string, password: string) {
@@ -35,117 +34,93 @@ export class AuthService {
       username,
       email,
       password,
-      role: UserRoleEnum.USER,
-      status: UserAccountStatusEnum.ACTIVE,
-      state: UserStateEnum.ONLINE,
+      status: UserAccountStatusEnum.PENDING,
     });
-    // Send Welcome Email
-    await this.emailService
-      .sendEmail({
-        email: email,
-        subject: "Welcome to A-Z Express! 🎉",
-        message: template.welcome_email.message.replace("username", username),
-        html: template.welcome_email.html.replace("username", username),
-      })
-      .catch((err) => logger.error("Failed to send welcome email:", err));
+
+    const verificationToken = jwtUitl.generateVerificationToken({
+      id: newUser.id,
+    });
+    const verificationLink = `${env.frontendUrl}/verify-email/${verificationToken}`;
+
+    // Send Verification Email
+    await this.notifyService.sendVerificationEmail(
+      email,
+      username,
+      verificationLink,
+    );
     return newUser;
   }
   async login(email: string, password: string, reqDeviceInfo: DeviceInfo) {
     const user = await this.userRepo.findByEmail(email);
     if (!user) ErrorFactory.throwUnauthorized("Invalid credentials");
 
-    // Check if account is locked
-    if (
-      user?.status === UserAccountStatusEnum.LOCKED &&
-      user.lockedUntil &&
-      user.lockedUntil > new Date()
-    ) {
-      const remainingTime = Math.ceil(
-        (user.lockedUntil.getTime() - Date.now()) / (1000 * 60), // in minutes
-      );
-      ErrorFactory.throwForbidden(
-        `Account is locked. Please try again in ${remainingTime} minutes.`,
-      );
-    }
-
-    const isMatch = await user?.comparePassword(password);
-    if (!isMatch) {
-      logger.log(`Failed login attempt for email: ${email}`);
-      // await this.handleFailedLogin(user);
-      ErrorFactory.throwUnauthorized("Invalid credentials");
-    }
-
     // 3. Status checks
-    switch (user?.status) {
+    const now = new Date();
+    switch (user.status) {
       case UserAccountStatusEnum.ACTIVE:
         break;
-      case UserAccountStatusEnum.INACTIVE:
+      case UserAccountStatusEnum.VERIFIED:
         break;
-      case UserAccountStatusEnum.ARCHIVED:
+      case UserAccountStatusEnum.INACTIVE:
+        // Allow login but maybe log it?
         break;
       case UserAccountStatusEnum.LOCKED:
-        if (user.lockedUntil && user.lockedUntil > new Date()) {
-          ErrorFactory.throwForbidden("Your account is currently locked.");
+        if (user.lockedUntil && user.lockedUntil > now) {
+          const remainingMinutes = Math.ceil(
+            (user.lockedUntil.getTime() - now.getTime()) / (1000 * 60),
+          );
+          ErrorFactory.throwForbidden(
+            `Account is locked. Please try again in ${remainingMinutes} minutes.`,
+          );
         }
+        // Lock expired, treated as active in handleSuccessfulLogin
         break;
       case UserAccountStatusEnum.DEACTIVATED:
+        ErrorFactory.throwForbidden(
+          "Your account has been deactivated. Please contact support.",
+        );
         break;
       case UserAccountStatusEnum.BANNED:
         ErrorFactory.throwForbidden(
-          "Your account has been banned. Please contact support.",
+          "Your account has been banned due to policy violations.",
         );
+        break;
+      case UserAccountStatusEnum.ARCHIVED:
+        ErrorFactory.throwForbidden("Account not found.");
+        break;
       case UserAccountStatusEnum.PENDING:
         ErrorFactory.throwForbidden(
           "Your account is pending verification. Please check your email.",
         );
-      case UserAccountStatusEnum.VERIFIED:
         break;
       default:
-        ErrorFactory.throwForbidden(
-          "Invalid account status. Please contact support.",
-        );
+        ErrorFactory.throwForbidden("Unauthorized access.");
     }
 
-    //   case "locked":
-    //     // Only block if the lockout is still active (redundant but safe)
-    //     if (user.lockedUntil && user.lockedUntil > new Date()) {
-    //       ErrorFactory ("Your account is currently locked.", 403);
-    //     }
-    //     break;
-    //   case "deactivated":
-    //     // If deactivated by someone else (Admin), block login
-    //     if (updaterId && updaterId !== userId) {
-    //       ErrorFactory (
-    //         "Your account has been deactivated by an administrator. Please contact support.",
-    //         403,
-    //       );
-    //     }
-    //     // If no updater record exists, block login for safety
-    //     if (!updaterId) {
-    //       ErrorFactory (
-    //         "Your account is deactivated. Please contact support for reactivation.",
-    //         403,
-    //       );
-    //     }
-    // break;
-    //   case "active":
-    //   case "inactive":
-    //     // These are allowed
-    //     break;
-    // }
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      await this.handleFailedLogin(user);
+      ErrorFactory.throwUnauthorized("Invalid credentials");
+    }
 
-    // 4. Handle successful login (includes reactivation/online update)
-    // await this.handleSuccessfulLogin(user);
+    // 4. Handle successful login (resets attempts, updates status/state)
+    await this.handleSuccessfulLogin(user);
 
-    const payload = {
-      id: user?.id,
-      email: user?.email,
-      username: user?.username,
-      role: user?.role ?? UserRoleEnum.USER,
-    } as TokenPayload;
+    // 4.5 Check 2FA
+    if (user.twoFactorEnabled) {
+      const loginToken = jwtUitl.generateResetToken({ id: user.id }); // Reuse reset token logic for temporary login token
+      return { status: "2FA_REQUIRED", loginToken };
+    }
+
+    const payload: TokenPayload = {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role ?? UserRoleEnum.USER,
+    };
 
     const token = jwtUitl.generateAccessToken(payload);
-    const refreshToken = jwtUitl.generateRefreshToken({ id: user.id }); // Minimal payload
+    const refreshToken = jwtUitl.generateRefreshToken({ id: user.id });
 
     // 5. Create Session
     const expiresIn = (env.refreshExpiresIn as ms.StringValue) || "7d";
@@ -164,69 +139,55 @@ export class AuthService {
 
     return { user: payload, token, refreshToken };
   }
-  // private async handleFailedLogin(user: any) {
-  //   // If the account was previously locked but the time has passed,
-  //   // we give the user a fresh start by resetting the counter before this failure.
-  //   let attempts = user.failedLoginAttempts || 0;
-  //   const isLockExpired =
-  //     user.status === "locked" &&
-  //     user.lockedUntil &&
-  //     user.lockedUntil <= new Date();
+  private async handleFailedLogin(user: any) {
+    let attempts = (user.failedLoginAttempts || 0) + 1;
+    const update: any = {
+      $set: { failedLoginAttempts: attempts },
+    };
 
-  //   if (isLockExpired) {
-  //     attempts = 1; // Start from 1 for this new failed attempt after wait
-  //   } else {
-  //     attempts += 1;
-  //   }
+    // Lock account after 5 failed attempts
+    if (attempts >= 5) {
+      logger.warn(
+        `Locking account for ${user.email} after ${attempts} attempts`,
+      );
+      update.$set.status = UserAccountStatusEnum.LOCKED;
+      update.$set.lockedUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes lockout
+      update.$set.state = UserStateEnum.OFFLINE;
 
-  //   logger.log(`Total failed attempts for ${user.email}: ${attempts}`);
+      // Notify user about security lockout
+      await this.notifyService.sendAccountLockedNotification(
+        user.email,
+        user.username,
+      );
+    }
 
-  //   const update: any = {
-  //     $set: { failedLoginAttempts: attempts },
-  //   };
+    await user.updateOne(update);
+  }
 
-  //   // Lock account after 5 failed attempts
-  //   if (attempts >= 5) {
-  //     logger.log(`Locking account for ${user.email}`);
-  //     update.$set.status = "locked";
-  //     update.$set.lockedUntil = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
-  //     update.$set.state = "offline";
-  //   }
+  private async handleSuccessfulLogin(user: any) {
+    let newStatus = user.status;
 
-  //   await user.updateOne(update);
-  // }
-  // private async handleSuccessfulLogin(user: UserDto & Document) {
-  //   // Only automatically reactivate if the status is 'inactive' or 'deactivated' (by self)
-  //   // Locked accounts also need to be reset if they passed the timed check above
-  //   let newStatus = user.status;
-  //   if (user.status === "inactive" || user.status === "locked") {
-  //     newStatus = "active";
-  //   } else if (user.status === "deactivated") {
-  //     //   const updaterId =
-  //     // user.updatedBy?._id?.toString() || user.updatedBy?.toString();
-  //     //   const userId = user._id.toString();
-  //     // ONLY reactivate if specifically deactivated by self
-  //     // if (updaterId === userId) {
-  //     //   newStatus = "active";
-  //     // }
-  //     // If updaterId is null/undefined, we err on the side of caution and keep it deactivated
-  //     // unless we want to allow auto-reactivation for legacy data.
-  //     // For now, let's keep it locked if it wasn't obviously self-deactivated.
-  //   }
+    // Auto-reactivate if status was locked (and we reached here, meaning lockout expired) or inactive
+    if (
+      user.status === UserAccountStatusEnum.LOCKED ||
+      user.status === UserAccountStatusEnum.INACTIVE
+    ) {
+      newStatus = UserAccountStatusEnum.ACTIVE;
+    }
 
-  //   await user.updateOne({
-  //     $set: {
-  //       state: "online",
-  //       status: newStatus,
-  //       activeAt: new Date(),
-  //       failedLoginAttempts: 0,
-  //       lockedUntil: null,
-  //     },
-  //     $unset: {
-  //       logoutAt: "",
-  //     },
-  //   });
-  // }
+    await user.updateOne({
+      $set: {
+        state: UserStateEnum.ONLINE,
+        status: newStatus,
+        activeAt: new Date(),
+        failedLoginAttempts: 0,
+        lockedUntil: null,
+      },
+      $unset: {
+        logoutAt: "",
+      },
+    });
+  }
 
   async logout(refreshToken: string) {
     const session = await this.sessionRepo.findByToken(refreshToken);
@@ -286,5 +247,225 @@ export class AuthService {
 
     return { accessToken, refreshToken: newRefreshToken };
   }
+  async changePassword(
+    userId: string,
+    oldPassword: string,
+    newPassword: string,
+  ) {
+    const user = await this.userRepo.findById(userId);
+    if (!user) ErrorFactory.throwUnauthorized("User not found");
+    const isMatch = await user.comparePassword(oldPassword);
+    if (!isMatch) ErrorFactory.throwUnauthorized("Invalid credentials");
+    user.password = newPassword;
+    await user.save();
+    return { user };
+  }
+  async forgotPassword(email: string) {
+    const user = await this.userRepo.findByEmail(email);
+    if (!user) ErrorFactory.throwNotFound("User not found");
+
+    // 1. Generate OTP (One-Shot)
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    user.resetOtp = {
+      code: otp,
+      expiresAt,
+    };
+
+    // 2. Generate JWT Link (Standard)
+    const resetToken = jwtUitl.generateResetToken({ id: user.id });
+    const resetLink = `${env.clientUrl}/reset-password/${resetToken}`;
+
+    await user.save();
+
+    await this.notifyService.sendPasswordResetEmail(
+      user.email,
+      user.username,
+      otp,
+      resetLink,
+    );
+
+    return { message: "Password reset instructions sent to your email" };
+  }
+
+  async resetPassword(
+    newPassword: string,
+    email?: string,
+    otp?: string,
+    token?: string,
+  ) {
+    let user;
+
+    if (token) {
+      // Logic A: Standard JWT Link
+      const payload = jwtUitl.verifyResetToken(token);
+      user = await this.userRepo.findById(payload.id);
+    } else if (email && otp) {
+      // Logic B: Strict One-Shot OTP
+      user = await this.userRepo.findByEmail(email);
+      if (!user) ErrorFactory.throwNotFound("User not found");
+
+      if (!user.resetOtp || !user.resetOtp.code) {
+        ErrorFactory.throwBadRequest("No active reset request found");
+      }
+
+      if (user.resetOtp.expiresAt < new Date()) {
+        user.resetOtp = null;
+        await user.save();
+        ErrorFactory.throwBadRequest("Reset code has expired");
+      }
+
+      const isMatch = user.resetOtp.code === otp;
+      if (!isMatch) {
+        user.resetOtp = null; // Strict Invalidation
+        await user.save();
+        ErrorFactory.throwBadRequest(
+          "Invalid reset code. For security, this code has been invalidated.",
+        );
+      }
+    } else {
+      ErrorFactory.throwBadRequest("Reset token or OTP is required");
+    }
+
+    if (!user) ErrorFactory.throwUnauthorized("User not found");
+
+    // Success logic for both paths
+    user.password = newPassword;
+    user.resetOtp = null; // Clear OTP if it was used or existed
+    await user.save();
+
+    await this.sessionRepo.deleteByUserId(user.id);
+    await this.notifyService.sendPasswordChangedConfirmation(user.email);
+
+    return { message: "Password updated successfully" };
+  }
+  async verifyEmail(token: string) {
+    const payload = jwtUitl.verifyVerificationToken(token);
+    const user = await this.userRepo.findById(payload.id);
+
+    if (!user) ErrorFactory.throwUnauthorized("User not found");
+
+    if (user.status === UserAccountStatusEnum.ACTIVE) {
+      return { message: "Email already verified", user };
+    }
+
+    user.status = UserAccountStatusEnum.ACTIVE;
+    user.verifiedAt = new Date();
+    await user.save();
+
+    // After verification, we can send the welcome email
+    await this.notifyService.sendWelcomeEmail(user.email, user.username);
+
+    return { user };
+  }
+
+  // --- 2FA Logic ---
+
+  async setup2FA(userId: string) {
+    const user = await this.userRepo.findById(userId);
+    if (!user) ErrorFactory.throwNotFound("User not found");
+
+    const secret = speakeasy.generateSecret({
+      name: `A-Z Express (${user.email})`,
+    });
+
+    const qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url || "");
+
+    // Temporarily save secret (not enabled yet)
+    await user.updateOne({ $set: { twoFactorSecret: secret.base32 } });
+
+    return {
+      secret: secret.base32,
+      qrCode: qrCodeUrl,
+    };
+  }
+
+  async verify2FA(userId: string, token: string) {
+    const user = await this.userRepo.findById(userId);
+    if (!user || !user.twoFactorSecret) {
+      ErrorFactory.throwBadRequest("2FA is not set up");
+    }
+
+    const verified = speakeasy.totp.verify({
+      secret: user.twoFactorSecret,
+      encoding: "base32",
+      token,
+    });
+
+    if (!verified) {
+      ErrorFactory.throwBadRequest("Invalid 2FA token");
+    }
+
+    return user;
+  }
+
+  async enable2FA(userId: string, token: string) {
+    await this.verify2FA(userId, token);
+    const user = await this.userRepo.findById(userId);
+    if (user) {
+      user.twoFactorEnabled = true;
+      await user.save();
+    }
+    return { message: "2FA enabled successfully" };
+  }
+
+  async disable2FA(userId: string, token: string) {
+    await this.verify2FA(userId, token);
+    const user = await this.userRepo.findById(userId);
+    if (user) {
+      user.twoFactorEnabled = false;
+      await user.updateOne({ $unset: { twoFactorSecret: "" } });
+      await user.save();
+    }
+    return { message: "2FA disabled successfully" };
+  }
+
+  async loginWith2FA(loginToken: string, token2FA: string, reqDeviceInfo: DeviceInfo) {
+    const payload = jwtUitl.verifyResetToken(loginToken); // Using verification logic for temp token
+    const user = await this.userRepo.findById(payload.id);
+
+    if (!user || !user.twoFactorEnabled || !user.twoFactorSecret) {
+      ErrorFactory.throwUnauthorized("Invalid request");
+    }
+
+    const verified = speakeasy.totp.verify({
+      secret: user.twoFactorSecret,
+      encoding: "base32",
+      token: token2FA,
+    });
+
+    if (!verified) {
+      ErrorFactory.throwBadRequest("Invalid 2FA token");
+    }
+
+    // Success: Generate full tokens
+    const userPayload: TokenPayload = {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role ?? UserRoleEnum.USER,
+    };
+
+    const token = jwtUitl.generateAccessToken(userPayload);
+    const refreshToken = jwtUitl.generateRefreshToken({ id: user.id });
+
+    const expiresIn = (env.refreshExpiresIn as ms.StringValue) || "7d";
+    const expiresDuration = ms(expiresIn) || ms("7d");
+    const expiresAt = new Date(Date.now() + (typeof expiresDuration === "number" ? expiresDuration : 0));
+
+    await this.sessionRepo.create({
+      userId: user.id,
+      refreshToken,
+      deviceInfo: reqDeviceInfo,
+      expiresAt,
+    });
+
+    return { user: userPayload, token, refreshToken };
+  }
 }
-export const authService = new AuthService(userRepo, emailService, sessionRepo);
+export const authService = new AuthService(
+  userRepo,
+  notifyService,
+  sessionRepo,
+);

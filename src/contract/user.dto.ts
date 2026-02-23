@@ -78,42 +78,29 @@ export type UserDto = At & {
   role: UserRole;
   status: UserAccountStatus;
   state: UserState;
-  //   verified?: boolean;
-  //   verifiedAt?: Date;
-  //   remember?: boolean;
   activeAt: Date;
   logoutAt: Date;
   lockedUntil: Date;
   failedLoginAttempts: number;
+  passwordChangedAt?: Date;
+  verifiedAt?: Date;
+  verifyOtp?: {
+    code: string;
+    expiresAt: Date;
+  } | null;
+  resetOtp?: {
+    code: string;
+    expiresAt: Date;
+  } | null;
+  twoFactorEnabled: boolean;
+  twoFactorSecret?: string;
   //   cart?: {
   //     type?: string;
   //     productId: string;
   //   }[];
   //   wishlist?: any[];
-
-  // resetPasswordToken: string;
-  // resetPasswordExpireAt: Date;
 };
 // orders: [{ type: Types.ObjectId, ref: "order", sparse: true }],
-// forgotPassword: String,
-// forgotPasswordExpiry: Date,
-// confirmPassword: string;
-// verificationToken: String,
-// verificationTokenExpireAt: Date,
-// verifyOtp: { type: String, default: "" },
-// verifyOtpExpireAt: { type: Number, default: 0 },
-// resetOtp: { type: String, default: "" },
-// resetOtpExpireAt: { type: Number, default: 0 },
 // wishlist: [{ type: Types.ObjectId, ref: "wishlist" }],
 // likes: [{ type: Types.ObjectId, ref: "likes" }],
 // favorite: [{ type: Types.ObjectId, ref: "favorite" }],
-
-// passwordChangedAt: Date;
-// passwordResetToken: string;
-// passwordResetExpires: Date;
-// emailVerifiedAt: Date;
-// emailVerificationToken: string;
-// emailVerificationExpires: Date;
-// emailConfirmationSentAt: Date;
-// emailConfirmationToken: string;
-// emailConfirmed: boolean;
